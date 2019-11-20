@@ -1,0 +1,32 @@
+BootStrap: library
+From: ubuntu:16.04
+
+
+
+
+%files
+    ./Makefile /usr/src/	
+
+%post
+    apt-get -y update
+    apt-get -y install fortune cowsay lolcat make netcat
+    NOW=`date`
+    echo "export NOW=\"${NOW}\"" >> $SINGULARITY_ENVIRONMENT
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/games:$PATH
+    export LISTEN_PORT=12345
+
+%startscript
+    nc -lp $LISTEN_PORT
+
+%runscript
+    fortune 
+    cowsay
+    lolcat
+    make
+    ls
+
+%labels
+    Author GodloveD
