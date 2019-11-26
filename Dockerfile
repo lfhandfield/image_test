@@ -8,3 +8,6 @@ RUN apt-get -y install libsdl2-2.0-0 libsdl2-net-2.0-0
 COPY src /src
 COPY Makefile /Makefile
 RUN ls
+RUN make && make all
+RUN echo Image created
+CMD ["helloworld"]
