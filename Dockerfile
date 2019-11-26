@@ -10,5 +10,7 @@ COPY src /src
 COPY Makefile /Makefile
 RUN ls
 RUN make
+COPY helloworld /usr/bin/display/helloworld
+ENV PATH="/usr/bin/display/:${PATH}"
 RUN echo Image created
 CMD ["helloworld"]
