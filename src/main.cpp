@@ -69,3 +69,64 @@ void DefaultRessourceLoader::useSound(const GUISOUND_enum){}
 int main(int argc, char** argv){
 	Task task;
 task(argc, argv);}
+
+Task::Task(){
+}
+
+void Task::nbaddtoken(char const * const token, int& min, int& max){
+    switch(*token){
+    case '\0':min =0; break;
+    case 'o': min =1; break;
+    }
+}
+void Task::store(char* const * token, int nbtoken){
+    switch(*token){
+    case 'o': min =1; break;
+    }
+}
+void Task::help(){
+        printf("Makes an Tiff file from a Tiff file, performing some basic operation.\n");
+        printf("Arguments: [2]\n");
+        printf("        (in file) input tif image\n");
+        printf("        (in file) output tif image\n");
+        printf("        (out file) output tif image\n");
+
+        printf("\n");
+        printf("Flags\n\n");
+        printf("\t-s:\tShow output in Preview (works on MacOS)\n");
+        printf("\t-o (FILE f='output.tif') : path for output.\n");
+        printf("Version 1.0\n");
+
+}
+int Task::OnMaintain(){//OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
+    dawin->render();
+return(0);}
+int Task::OnKeyDown(const SDL_KeyboardEvent& event){ //OnKeyDown(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
+    switch(event.keysym.sym){
+    case '3':{ //:
+
+    }break;//:
+    default:
+    ffr->makeDefault();
+    }
+return(0);}
+int Task::OnKeyUp(const SDL_KeyboardEvent& event){ //OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
+return(0);}
+int Task::listen(GUImessage& msg){
+return(0);}
+
+int Tasksdefstore(char* const * token, int nbtoken){
+    if (!Controlstate::init_SDL(NULL,NULL)) return 1;
+    if (!Controlstate::init_openGL()) return 1;
+    ctrl_state << this;
+    dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,RELPOS_RIGHT,false, 0);
+    ctrl_state.curwin = dawin;
+    
+    (*ctrl_state.curwin) << *this;
+    DefaultRessourceLoader* resl = new DefaultRessourceLoader();
+    ctrl_state.main_control_loop(resl);
+    delete(resl);
+return 0;}
+
+
+
