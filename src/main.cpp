@@ -123,7 +123,7 @@ int Task::defstore(char* const * token, int nbtoken){
     dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,LFHDisplay::RELPOS_RIGHT,false, 0);
     LFHDisplay::ctrl_state.curwin = dawin;
     
-    (*LFHDisplay::ctrl_state.curwin) << *this;
+    (*LFHDisplay::ctrl_state.curwin) << this;
     DefaultRessourceLoader* resl = new DefaultRessourceLoader();
     LFHDisplay::ctrl_state.main_control_loop(resl);
     delete(resl);
