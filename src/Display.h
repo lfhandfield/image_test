@@ -1548,7 +1548,7 @@ class GUICumulus : public GUIObject{
 }; // namespace end
 
 #ifdef _SDL_NET_H
-  #include "./NetEvents.h"
+  //#include "./NetEvents.h"
 #endif
 
 
