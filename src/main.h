@@ -15,6 +15,7 @@ class DefaultRessourceLoader : public LFHDisplay::RessourceLoader{
     void deallocTextureExt(uint32_t);
 };
 
+#define TASK_MEMBER_DEFINITIONS Taskscope(); int defstore(char* const * token, int nbtoken); void store(char* const * token, int nbtoken); void nbaddtoken(char const * const token, int& min, int& max); void help();
 
 class Task : public LFHPrimitive::ArgumentParser, public LFHDisplay::ProcessState, public LFHDisplay::renderMode{
 	public:
