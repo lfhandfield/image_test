@@ -8,7 +8,7 @@ bastructs.o: src/bastructs.cpp src/bastructs.hpp src/bastructs.h
 	g++ -std=c++11 -o bastructs.o src/bastructs.cpp
 
 cstructs.o: src/cstructs.cpp src/cstructs.h
-	g++ -std=c++11 -o bastructs.o src/cstructs.cpp
+	g++ -std=c++11 -o cstructs.o src/cstructs.cpp
 	
 primitive.o: src/primitive.cpp src/primitive.hpp src/primitive.h
 	g++ -std=c++11 -o primitive.o src/primitive.cpp
