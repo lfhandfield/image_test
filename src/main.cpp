@@ -112,7 +112,10 @@ int Task::OnKeyUp(const SDL_KeyboardEvent& event){ //OnKeyUp(Event.key.keysym.sy
 return(0);}
 int Task::listen(LFHDisplay::GUImessage& msg){
 return(0);}
-
+void Task::draw(LFHDisplay::MyWindow*){
+}
+void Task::drawAlias(LFHDisplay::MyWindow*){
+}
 int Tasksdefstore(char* const * token, int nbtoken){
     if (!LFHDisplay::Controlstate::init_SDL(NULL,NULL)) return 1;
     if (!LFHDisplay::Controlstate::init_openGL()) return 1;
