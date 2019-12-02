@@ -14,7 +14,6 @@ DefaultRessourceLoader::DefaultRessourceLoader(){
 }
 
 void DefaultRessourceLoader::loadTexture(char* path, GLuint& slot, int flag){
-
     LFHPrimitive::TiffFile tf(path);
 	LFHPrimitive::DataGrid<unsigned char, 3> im;
     Tuple<unsigned int,3> coooo; // tmp
@@ -59,12 +58,11 @@ void DefaultRessourceLoader::loadTexture(char* path, GLuint& slot, int flag){
     }
 
 }
-void DefaultRessourceLoader::useTexture(const GUITEXTURES_enum which){glBindTexture(GL_TEXTURE_2D, textures[(int) which]);}
-void DefaultRessourceLoader::useTextureExt(unsigned int ID){}
-void DefaultRessourceLoader::allocTextureExt(unsigned int ID){}
-void DefaultRessourceLoader::deallocTextureExt(unsigned int ID){}
-void DefaultRessourceLoader::useSound(const GUISOUND_enum){}
-
+void DefaultRessourceLoader::useTexture(const uint32_t which){glBindTexture(GL_TEXTURE_2D, textures[(int) which]);}
+void DefaultRessourceLoader::useTextureExt(uint32_t ID){}
+void DefaultRessourceLoader::allocTextureExt(uint32_t ID){}
+void DefaultRessourceLoader::deallocTextureExt(uint32_t ID){}
+void DefaultRessourceLoader::useSound(const uint32_t){}
 
 int main(int argc, char** argv){
 	Task task;
