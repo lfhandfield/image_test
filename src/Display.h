@@ -36,14 +36,13 @@
 #else${COMPILER_LIB}
 */
 
-#ifdef Rcpp_hpp
-#include "SDL2/SDL.h"
-#else
+//#ifdef Rcpp_hpp
+//#include "SDL2/SDL.h"
+//#else
 // #include "SDL2/SDL.h"
-#include "SDL.h"
-#include "SDL_net.h"
-#include "SDL_mixer.h"
-#endif
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
+//#endif
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
