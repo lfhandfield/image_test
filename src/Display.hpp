@@ -1,3 +1,25 @@
+/*
+ * display.hpp
+ *
+ * Copyright (C) 2019 Louis-Francois Handfield
+ * e-mail: lfhandfield@gmail.com
+ *
+ * This program is free software; upon notification by email to the licensor
+ * of the licencee identity and nature of use, the licencee can redistribute
+ * this program and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2
+ * of the License, or (at the licencee option) any later version. As such,
+ * no further notifications are required.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
 
 namespace LFHDisplay{
 
@@ -122,7 +144,7 @@ template<class C> void GUITextArea::setDico(DicoElem<C>& whay){this->setDico(&wh
 
 #undef LFHTEMP
 #define LFHTEMP template <class TARG>
-
+/*
  LFHTEMP AliasPtr<TARG>::AliasPtr(const AliasPtr<TARG>& input): alias(input.alias){
     if (alias) {
         unsigned int ite = AliasBank.find(alias);
@@ -204,90 +226,7 @@ template<class C> void GUITextArea::setDico(DicoElem<C>& whay){this->setDico(&wh
     from.alias =0u;
     return *this;
 }
-
-#undef LFHTEMP
-#define LFHTEMP template <class TARG,bool READONLY>
-LFHTEMP void LockPtr<TARG,READONLY>::initAlias(const unsigned int &alias){
-   unsigned int tridmask = ((unsigned int)ctrl_state.ThreadID_mask[SDL_ThreadID()]) << 28;
-   unsigned int ite =  AliasBank.find(alias);// printf("found %i\n", ite);
-    if (ite == 0xFFFFFFFF) target =NULL;
-    else{
-       // printf("mass found %i\n", (AliasBank.deref(ite).second & 0xFF000000) >> 24);
-        if ((AliasBank.deref(ite).second & 0xF0000000) == 0xF0000000) { // read-only lock!
-            target = NULL;
-        }else if ((AliasBank.deref(ite).second & 0xFF000000) != 0) {
-            if  ((AliasBank.deref(ite).second & 0xF0000000) == tridmask) {AliasBank.deref(ite).second += 0x01000000; target = (TARG*) AliasBank.deref(ite).first;}
-            else target = NULL;
-        }else{
-            AliasBank.deref(ite).second += 0x01000000;
-            if ((AliasBank.deref(ite).second & 0xFF000000) == 0x01000000) {target = (TARG*) AliasBank.deref(ite).first; AliasBank.deref(ite).second |= tridmask;}
-            else{ AliasBank.deref(ite).second -= 0x01000000;target = NULL;}
-        }
-        }
-}
-
- LFHTEMP LockPtr<TARG,READONLY>::LockPtr(const AliasPtr<TARG> &tar){initAlias(tar.alias);}
- LFHTEMP LockPtr<TARG,READONLY>::LockPtr(const unsigned int &alias){initAlias(alias);}
-
-
- LFHTEMP LockPtr<TARG,READONLY>::~LockPtr(){if (target != NULL) {
-        unsigned int ite = AliasOf.find(target);
-        ite = AliasBank.find(AliasOf.deref(ite));
-        AliasBank.deref(ite).second -= 0x01000000;
-        if ((AliasBank.deref(ite).second & 0x0F000000) == 0) AliasBank.deref(ite).second &= 0x0FFFFFFF;
-    }
-    }
- LFHTEMP TARG* LockPtr<TARG,READONLY>::operator->()const{return target;}
- LFHTEMP TARG& LockPtr<TARG,READONLY>::operator*()const{return *target;}
-
- LFHTEMP bool LockPtr<TARG,READONLY>::isValid()const{return target != NULL;}
-
- LFHTEMP template<class NTYPE> LockPtr<TARG,READONLY>::operator NTYPE* ()const{return (NTYPE*) target;}
-#undef LFHTEMP
-#define LFHTEMP template <class TARG>
-LFHTEMP void LockPtr<TARG,true>::initAlias(const unsigned int &alias){
-   unsigned int tridmask = ((unsigned int)ctrl_state.ThreadID_mask[SDL_ThreadID()]) << 28;
-   unsigned int ite =  AliasBank.find(alias);
-   printf("ThreadID %i\n",SDL_ThreadID());
-    if (ite == 0xFFFFFFFF) target =NULL;
-    else{
-       // printf("mass found %i\n", (AliasBank.deref(ite).second & 0xFF000000) >> 24);
-        AliasBank.deref(ite).second += 0x01000000;
-       // printf("mass found %i\n", (AliasBank.deref(ite).second & 0xFF000000) >> 24);
-        if ((AliasBank.deref(ite).second & 0xFF000000) == 0x01000000) target = (TARG*) AliasBank.deref(ite).first;
-        else{AliasBank.deref(ite).second -= 0x01000000;
-        target = NULL;}
-    }
-    }
-
- LFHTEMP LockPtr<TARG, true>::LockPtr(const AliasPtr<TARG> &tar){initAlias(tar.alias);}
- LFHTEMP LockPtr<TARG, true>::LockPtr(const unsigned int &alias){initAlias(alias);}
- LFHTEMP LockPtr<TARG, true>::~LockPtr(){if (target != NULL) {
-        unsigned int ite = AliasOf.find(target);
-        ite = AliasBank.find(AliasOf.deref(ite));
-        AliasBank.deref(ite).second -= 0x01000000;}
-    }
- LFHTEMP const TARG* LockPtr<TARG, true>::operator->()const{return target;}
- LFHTEMP const TARG& LockPtr<TARG, true>::operator*()const{return *target;}
- LFHTEMP bool LockPtr<TARG, true>::isValid()const{return target != NULL;}
-
- LFHTEMP template<class NTYPE> LockPtr<TARG, true>::operator const NTYPE* ()const{return (const NTYPE*) target;}
-
-
-template<class NTYPE> LockPtr<void, true>::operator const NTYPE* ()const{return (const NTYPE*) target;}
-template<class NTYPE> LockPtr<void, false>::operator NTYPE* ()const{return (NTYPE*) target;}
-
-/*
- LFHTEMP template<class HOST> void AliasPtr<TARG>::setDestroyOnClear(HOST* what){
-    if (alias == 0) {fprintf(stderr,"alias based AutoDelete on void target, is illegal!\n");exit(1);}
-    unsigned int ite =  static_alias_bank.auto_destroy.find(alias);
-    if (ite == 0xFFFFFFFF) {
-        static_alias_bank.auto_destroy[alias] = Vector< ListenerPointer<int> >();
-        ite =  static_alias_bank.auto_destroy.find(alias);
-        }
-//    static_alias_bank.auto_destroy.deref(ite).push_back(MakeitDie<HOST>(what));
-}*/
-
+*/
 
 template<class A> void GUIArea::insertGUI(A*a){ subs.push_back(a->GUI_alias); ctrl_state.gui_objects_ptr[a->GUI_alias].parent_alias = this->GUI_alias; }
 template<class A> void GUIArea::removeGUI(A*a){ this->removeGUI(a->GUI_alias); }

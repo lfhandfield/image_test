@@ -1,3 +1,28 @@
+/*
+ * display.cpp
+ *
+ * Copyright (C) 2019 Louis-Francois Handfield
+ * e-mail: lfhandfield@gmail.com
+ *
+ * This program is free software; upon notification by email to the licensor
+ * of the licencee identity and nature of use, the licencee can redistribute
+ * this program and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2
+ * of the License, or (at the licencee option) any later version. As such,
+ * no further notifications are required.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+
+
 #include "./Display.h"
 
 namespace LFHDisplay{
@@ -2341,10 +2366,10 @@ void GUIStyle::setToMenuDefault(){
 
     SDL_GL_SetSwapInterval(1);
 
-    if(!gladLoadGL()) {
+    /*if(!gladLoadGL()) {
         printf("Something went wrong!\n");
         exit(-1);
-    }
+    }*/
 
   //  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   //  SDL_RenderClear(renderer);
@@ -4787,54 +4812,6 @@ unsigned int GUITaskEvent::operator()(){
         }
     return(0);
     }
-LockPtr<void, true>::LockPtr(const AliasPtr<void> &tar){initAlias(tar.alias);}
-LockPtr<void, true>::LockPtr(const unsigned int &alias){initAlias(alias);}
-LockPtr<void, true>::~LockPtr(){if (target != NULL) {
-        unsigned int ite = AliasOf.find(target);
-        ite = AliasBank.find(AliasOf.deref(ite));
-        AliasBank.deref(ite).second -= 0x01000000;}
-    }
-void LockPtr<void, true>::initAlias(const unsigned int &alias){
-   // unsigned int tridmask = ((unsigned int)ctrl_state.ThreadID_mask[SDL_ThreadID()]) << 28;
-   unsigned int ite = AliasBank.find(alias);
-    if (ite == 0xFFFFFFFF) target =NULL;
-    else{
-       // printf("mass found %i\n", (AliasBank.deref(ite).second & 0xFF000000) >> 24);
-        AliasBank.deref(ite).second += 0x01000000;
-       // printf("mass found %i\n", (AliasBank.deref(ite).second & 0xFF000000) >> 24);
-        if ((AliasBank.deref(ite).second & 0xFF000000) == 0x01000000) target = (const void*) AliasBank.deref(ite).first;
-        else{AliasBank.deref(ite).second -= 0x01000000;
-        target = NULL;}
-    }
-    }
-LockPtr<void,false>::LockPtr(const AliasPtr<void> &tar){initAlias(tar.alias);}
-LockPtr<void,false>::LockPtr(const unsigned int &alias){initAlias(alias);}
-
-LockPtr<void,false>::~LockPtr(){if (target != NULL) {
-        unsigned int ite = AliasOf.find(target);
-        ite = AliasBank.find(AliasOf.deref(ite));
-        AliasBank.deref(ite).second -= 0x01000000;
-        if ((AliasBank.deref(ite).second & 0x0F000000) == 0) AliasBank.deref(ite).second &= 0x0FFFFFFF;
-    }
-    }
-void LockPtr<void,false>::initAlias(const unsigned int &alias){
-   unsigned int tridmask = ((unsigned int)ctrl_state.ThreadID_mask[SDL_ThreadID()]) << 28;
-   unsigned int ite =  AliasBank.find(alias);// printf("found %i\n", ite);
-    if (ite == 0xFFFFFFFF) target =NULL;
-    else{
-       // printf("mass found %i\n", (AliasBank.deref(ite).second & 0xFF000000) >> 24);
-        if ((AliasBank.deref(ite).second & 0xF0000000) == 0xF0000000) { // read-only lock!
-            target = NULL;
-        }else if ((AliasBank.deref(ite).second & 0xFF000000) != 0) {
-            if  ((AliasBank.deref(ite).second & 0xF0000000) == tridmask) {AliasBank.deref(ite).second += 0x01000000; target = (void*) AliasBank.deref(ite).first;}
-            else target = NULL;
-        }else{
-            AliasBank.deref(ite).second += 0x01000000;
-            if ((AliasBank.deref(ite).second & 0xFF000000) == 0x01000000) {target = (void*) AliasBank.deref(ite).first; AliasBank.deref(ite).second |= tridmask;}
-            else{ AliasBank.deref(ite).second -= 0x01000000;target = NULL;}
-        }
-        }
-}
 
 
 

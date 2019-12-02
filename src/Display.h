@@ -1,3 +1,26 @@
+/*
+ * display.h
+ *
+ * Copyright (C) 2019 Louis-Francois Handfield
+ * e-mail: lfhandfield@gmail.com
+ *
+ * This program is free software; upon notification by email to the licensor
+ * of the licencee identity and nature of use, the licencee can redistribute
+ * this program and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2
+ * of the License, or (at the licencee option) any later version. As such,
+ * no further notifications are required.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
 #ifndef _defined_LFHDisplay
 #define _defined_LFHDisplay
 
@@ -36,13 +59,14 @@
 #else${COMPILER_LIB}
 */
 
-//#ifdef Rcpp_hpp
-//#include "SDL2/SDL.h"
-//#else
+#ifdef Rcpp_hpp
+#include "SDL2/SDL.h"
+#else
 // #include "SDL2/SDL.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
-//#endif
+#include "SDL.h"
+#include "SDL_net.h"
+#include "SDL_mixer.h"
+#endif
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -1003,85 +1027,7 @@ class GUIButton : public GUIObject{
     double	getValue()const{return 0;}
     GUIMSG_Enum 	    processGUIevent(const GUIMSG_Enum event);
 };
-template<class TARG> class AliasPtr{
-public:
-    unsigned int alias;
-    AliasPtr(): alias(0){}
-    AliasPtr(const AliasPtr<TARG>& );
-    AliasPtr(const TARG * );
-    AliasPtr<TARG>& operator=(const AliasPtr<TARG>&);
-    AliasPtr<TARG>& operator=(const TARG* );
-    ~AliasPtr(){clear();}
 
-    void clear();
-
-    inline bool operator==(const AliasPtr<TARG>& other)const {return alias == other.alias;}
-//    inline bool operator==(const Alias& other)const {return alias == other.alias;}
-
-    const TARG* operator->() const; // read-only ptr, use with care
-    const TARG* operator*() const; // read-only ptr, use with care
-    void freePointer() const;
-
-    AliasPtr<TARG>& memmove(AliasPtr<TARG>& from );
-
-    bool isValid()const;
-    // template<class HOST> void setDestroyOnClear(HOST* what); // if object pointed by alias is destroyed, destroy host as well!
-};
-template<class TARG, bool READONLY = false> class LockPtr{
-    void initAlias(const unsigned int &alias); // called by contruction
-    public:
-    TARG* target; // locks target (cannot be moved or destroyed)
-    LockPtr(): target(NULL){}
-    LockPtr(const AliasPtr<TARG>&);
-    LockPtr(const unsigned int&);
-
-    ~LockPtr();
-    template<class NTYPE> operator NTYPE* ()const;
-    bool isValid()const;
-    TARG* operator->() const;
-    TARG& operator*() const;
-};
-template< > template<class TARG> class LockPtr<TARG, true>{
-    void initAlias(const unsigned int &alias); // called by contruction
-    public:
-    const TARG* target; // locks target (cannot be moved or destroyed)
-    LockPtr(): target(NULL){}
-    LockPtr(const AliasPtr<TARG>&);
-    LockPtr(const unsigned int&);
-    ~LockPtr();
-    template<class NTYPE> operator const NTYPE* ()const;
-    bool isValid()const;
-    const TARG* operator->() const;
-    const TARG& operator*() const;
-};
-template< > class LockPtr<void, true>{
-    void initAlias(const unsigned int &alias); // called by contruction
-    public:
-    const void* target; // locks target (cannot be moved or destroyed)
-    LockPtr(const AliasPtr<void>&);
-    LockPtr(const unsigned int&);
-    ~LockPtr();
-    template<class NTYPE> operator const NTYPE* ()const;
-    bool isValid()const{return target != NULL;}
-    const void* operator->() const{return target;}
-};
-template< > class LockPtr<void, false>{
-    void initAlias(const unsigned int &alias); // called by contruction
-    public:
-    void* target; // locks target (cannot be moved or destroyed)
-    LockPtr(const AliasPtr<void>&);
-    LockPtr(const unsigned int&);
-    ~LockPtr();
-    template<class NTYPE> operator NTYPE* ()const;
-    bool isValid()const{return target != NULL;}
-    void* operator->() const{return target;}
-};
-template<class KEY, class KEYHASH = defaultHashFnc<KEY> > class HashofAliases{
-public:
-    LFHPrimitive::myHashmap<KEY, unsigned int, KEYHASH> alias_hash;
-    template<class C> LockPtr<C, false> operator[](const KEY &);
-    template<class C> LockPtr<C, true> operator[](const KEY &);
-};
 class MyWindow : public GUIArea{
     public:
     bool isfullscr;
@@ -1548,7 +1494,7 @@ class GUICumulus : public GUIObject{
 }; // namespace end
 
 #ifdef _SDL_NET_H
-  //#include "./NetEvents.h"
+  #include "./NetEvents.h"
 #endif
 
 
