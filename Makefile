@@ -1,5 +1,5 @@
 helloworld: main.o bastructs.o primitive.o display.o glad.o
-	g++ -std=c++11 main.o bastructs.o primitive.o display.o glad.o -l SDL2 -l GL -l SDL2_net -o helloworld
+	g++ -std=c++11 main.o bastructs.o primitive.o display.o glad.o -l SDL2 -l GL -l SDL2_net -lpthread -o helloworld
 
 display.o: src/Display.cpp src/Display.h src/Display.hpp
 	g++ -std=c++11 -o display.o src/Display.cpp
