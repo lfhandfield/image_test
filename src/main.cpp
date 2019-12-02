@@ -116,7 +116,7 @@ void Task::draw(LFHDisplay::MyWindow*){
 }
 void Task::drawAlias(LFHDisplay::MyWindow*){
 }
-int Tasks::defstore(char* const * token, int nbtoken){
+int Task::defstore(char* const * token, int nbtoken){
     if (!LFHDisplay::Controlstate::init_SDL(NULL,NULL)) return 1;
     if (!LFHDisplay::Controlstate::init_openGL()) return 1;
     LFHDisplay::ctrl_state << this;
