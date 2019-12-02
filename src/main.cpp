@@ -4,7 +4,7 @@ DefaultRessourceLoader::DefaultRessourceLoader(){
     this->loadTexture("/opt/display/Images/ft04data.tif", textures[0], 8);
     this->loadTexture("/opt/display/Images/ft04coor.tif", textures[1], 8);
     this->loadTexture("/opt/display/Images/guisbars.tif", textures[2], 0);
-    this->loadTexture("/opt/display/Images/guibuttn.tif", textures[(int)GUITEXTURES_BUTTON], 0);
+    this->loadTexture("/opt/display/Images/guibuttn.tif", textures[3], 0);
     this->loadTexture("/opt/display/Images/guiicons.tif", textures[4], 0);
     this->loadTexture("/opt/display/Images/palette0.tif", textures[5], 0);
     this->loadTexture("/opt/display/Images/guitexts.tif", textures[6], 0);
@@ -13,7 +13,7 @@ DefaultRessourceLoader::DefaultRessourceLoader(){
     this->loadTexture("/opt/display/Images/gtoolbar.tif", textures[9], 0);
 }
 
-void DefaultRessourceLoader::loadTexture(char* path, GLuint& slot, int flag){
+void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int flag){
     LFHPrimitive::TiffFile tf(path);
 	LFHPrimitive::DataGrid<unsigned char, 3> im;
     Tuple<unsigned int,3> coooo; // tmp
@@ -110,19 +110,19 @@ int Task::OnKeyDown(const SDL_KeyboardEvent& event){ //OnKeyDown(Event.key.keysy
 return(0);}
 int Task::OnKeyUp(const SDL_KeyboardEvent& event){ //OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
 return(0);}
-int Task::listen(GUImessage& msg){
+int Task::listen(LFHDisplay::GUImessage& msg){
 return(0);}
 
 int Tasksdefstore(char* const * token, int nbtoken){
-    if (!Controlstate::init_SDL(NULL,NULL)) return 1;
-    if (!Controlstate::init_openGL()) return 1;
-    ctrl_state << this;
+    if (!LFHDisplay::Controlstate::init_SDL(NULL,NULL)) return 1;
+    if (!LFHDisplay::Controlstate::init_openGL()) return 1;
+    LFHDisplay::ctrl_state << this;
     dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,RELPOS_RIGHT,false, 0);
-    ctrl_state.curwin = dawin;
+    LFHDisplay::ctrl_state.curwin = dawin;
     
-    (*ctrl_state.curwin) << *this;
+    (*LFHDisplay::ctrl_state.curwin) << *this;
     DefaultRessourceLoader* resl = new DefaultRessourceLoader();
-    ctrl_state.main_control_loop(resl);
+    LFHDisplay::ctrl_state.main_control_loop(resl);
     delete(resl);
 return 0;}
 
