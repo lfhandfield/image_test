@@ -12,7 +12,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include "bastructs.h"
-#include "display.h"
+#include "Display.h"
 
 using namespace LFHPrimitive;
 
