@@ -8,11 +8,11 @@ class DefaultRessourceLoader : public LFHDisplay::RessourceLoader{
 
     DefaultRessourceLoader();
     void loadTexture(char* path, GLuint& where, int flag);
-    void useTexture(const GUITEXTURES_enum);
-    void useSound(const GUISOUND_enum);
-    void useTextureExt(unsigned int ID);
-    void allocTextureExt(unsigned int ID);
-    void deallocTextureExt(unsigned int ID);
+    void useTexture(const uint32_t);
+    void useSound(const uint32_t);
+    void useTextureExt(uint32_t);
+    void allocTextureExt(uint32_t);
+    void deallocTextureExt(uint32_t);
 };
 
 
