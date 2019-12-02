@@ -91,22 +91,52 @@ void ThreadBase::submit_ThenWait(std::function<void()> what){
     flushMsgs();
 }
 
+int ThreadBase::printLog(const char *__format, ...) {
+    std::unique_lock<std::mutex> lck(thrbase.accessFinalMutex());
+    va_list __va; va_start(__va, __format);
+    // std::fprintf(log, "thr%i:", std::this_thread::get_id());
+    int __res = std::vfprintf(log, __format, __va);
+    va_end(__va);
+    fflush(log);
+return __res;}
+int ThreadBase::printLogF(const char *__format, ...) {
+    va_list __va; va_start(__va, __format);
+    std::fprintf(log, "thr%X:", std::hash<std::thread::id>()(std::this_thread::get_id()) & 65535);
+    int __res = std::vfprintf(log, __format, __va);
+    va_end(__va);
+    fflush(log);
+return __res;}
+int ThreadBase::fprintf(FILE* f, const char *__format, ...) {
+    if (f == NULL) f = log;
+    std::unique_lock<std::mutex> lck(thrbase.accessFinalMutex());
+    va_list __va; va_start(__va, __format);
+    std::fprintf(f, "thr%X:", std::hash<std::thread::id>()(std::this_thread::get_id()) & 65535);
+    int __res = std::vfprintf(stdout, __format, __va);
+    va_end(__va);
+return __res;}
+int ThreadBase::fprintf_l(FILE* f,const char *__format, ...) {
+    if (f == NULL) f = log;
+    va_list __va; va_start(__va, __format);
+    std::fprintf(f, "thr%X:", std::hash<std::thread::id>()(std::this_thread::get_id()) & 65535);
+    int __res = std::vfprintf(f, __format, __va);
+    va_end(__va);
+    fflush(f);
+return __res;}
+
 int ThreadBase::print(const char *__format, ...) {
-  va_list __va;
-  va_start(__va, __format);
-  char buffer[65536];
-  int __res = vsprintf(buffer, __format, __va);
-  va_end(__va);
-  msgs.insert(string(buffer));
-  return __res;
-}
+    va_list __va; va_start(__va, __format);
+    char buffer[65536];
+    int __res = std::vsprintf(buffer, __format, __va);
+    va_end(__va);
+    msgs.insert(string(buffer));
+return __res;}
+
 
 void ThreadBase::terminate(const char* __format, ...){
     running = false;
-    va_list __va;
-    va_start(__va, __format);
+    va_list __va; va_start(__va, __format);
     char buffer[65536];
-    int __res = vsprintf(buffer, __format, __va);
+    int __res = std::vsprintf(buffer, __format, __va);
     va_end(__va);
     msgs.insert(string(buffer));
 exit(1);}
@@ -182,13 +212,13 @@ void ThreadBase::flushMsgs(FILE *f){
         while (msgs.pop(msgstar)){
         if (old == msgstar) cnt++;
         else {
-        if (cnt) {fprintf(f,"(x%i) %s\n", cnt+1, old.c_str()); cnt=0;}
-        else fprintf(f,"%s\n", old.c_str());
+        if (cnt) {std::fprintf(f,"(x%i) %s\n", cnt+1, old.c_str()); cnt=0;}
+        else std::fprintf(f,"%s\n", old.c_str());
         old = std::move(msgstar);
         }
         }
-        if (cnt) fprintf(f,"(x%i) %s\n", cnt+1, old.c_str());
-        else fprintf(f,"%s\n", old.c_str());
+        if (cnt) std::fprintf(f,"(x%i) %s\n", cnt+1, old.c_str());
+        else std::fprintf(f,"%s\n", old.c_str());
     }
 }
 void ThreadBase::startEvent_ThenWait(Event<void>* ev){(*ev)();this->waitForAllThreads();}
@@ -196,12 +226,12 @@ void ThreadBase::test(){
     Tuple<int,4u> hoho;
     Tuple<double,4u> haha;
     /*hoho.show();
-    printf("hello!\n");
+    std::printf("hello!\n");
     thrds[0] = CRT_THREAD(hoho, toZero);
     thrds[1] = CRT_THREAD(haha, toOne);
     thrds[2] = std::thread(static_call_test, 2);
     thrds[3] = std::thread(static_call_test, 5);
-    printf("sent!\n");
+    std::printf("sent!\n");
     thrds[0].join();
     thrds[1].join();
     thrds[2].join();
@@ -218,7 +248,7 @@ void ThreadBase::test(){
     // that lambda line
 
    // thrds[0].join();
-    printf("end comfirmed!\n");
+    std::printf("end comfirmed!\n");
 }
 void ThreadBase::startProgress(const char* text, uint32_t totalsteps){
     async_progress_maintain = 0u;

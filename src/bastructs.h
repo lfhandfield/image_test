@@ -1,7 +1,7 @@
 /*
  * bastructs.h
  *
- * Copyright (C) 2013 Louis-Francois Handfield
+ * Copyright (C) 2019 Louis-Francois Handfield
  * e-mail: lfhandfield@gmail.com
  *
  * This program is free software; upon notification by email to the licensor
@@ -2387,13 +2387,17 @@ class AsyncHashmap{
 template<class C, class HF>
 class AsyncHashmap<C, void, HF>{
     std::atomic<uint32_t> chunkIO;
+    std::atomic<uint32_t> angryIO;
     void rehash(uint32_t _hsize);
     uint32_t find_routine(const typename ExCo<C>::INDEX_TYPE &key) const;
 
     uint32_t try_create_routine(const typename ExCo<C>::INDEX_TYPE &key, uint32_t &exitcode);
     uint32_t block_create_routine(const typename ExCo<C>::INDEX_TYPE &key, uint32_t &exitcode);
+    //uint32_t find_create_routine(const typename ExCo<C>::INDEX_TYPE &key); // (blocking)
 
-    uint32_t find_create_routine(const typename ExCo<C>::INDEX_TYPE &key); // (blocking)
+    void moveEntry_routine(uint32_t from, uint32_t to); // finalmutex & permissions obtained
+
+    void delayed_remove_routine(const typename ExCo<C>::INDEX_TYPE &key, std::unique_lock<std::mutex> &lck);
 public:
     uint32_t asize;
     uint32_t hsize;
@@ -2403,13 +2407,16 @@ public:
 
     AsyncHashmap():asize(0){}
     ~AsyncHashmap(){if (asize != 0) {delete[](darray); delete[](dahash);}}
-
+    AsyncHashmap(const AsyncHashmap<C, void, HF>&)=delete;
+    AsyncHashmap(AsyncHashmap<C, void, HF>&&)=delete;
+    AsyncHashmap& operator=(const AsyncHashmap<C, void, HF>&)=delete;
+    AsyncHashmap& operator=(AsyncHashmap<C, void, HF>&&)=delete;
 
 
     // insert/remove   lock for read/write
     class WriteAccess{
         uint32_t try_write_routine(const typename ExCo<C>::INDEX_TYPE &key);
-        uint32_t block_write_routine(const typename ExCo<C>::INDEX_TYPE &key); // returns immediately if object is not found
+        uint32_t block_routine(const typename ExCo<C>::INDEX_TYPE &key); // returns immediately if object is not found
         friend class AsyncHashmap<C, void, HF>;
     public:
         AsyncHashmap<C, void, HF> &target;
@@ -2421,15 +2428,18 @@ public:
         WriteAccess(WriteAccess&&o): target(o.target), elem(o.elem), exitcode(o.exitcode){o.exitcode =0;}
         WriteAccess& operator=(const WriteAccess&)= delete;
         WriteAccess& operator=(WriteAccess&& o){exitcode = o.exitcode; o.exitcode =0; elem = o.elem; target = o.target; return *this;}
+        void unlock(); // preemptively unlock target prior to destruction
 
         operator bool()const {return exitcode != 0;}
         C* operator->(){return elem;}
         C& operator*(){return *elem;}
+        void remove();
     };
 
     class ReadAccess{
         bool find_only_routine(const typename ExCo<C>::INDEX_TYPE &key);
         uint32_t find_read_routine(const typename ExCo<C>::INDEX_TYPE &key);
+        uint32_t block_routine(const typename ExCo<C>::INDEX_TYPE &key); // returns immediately if object is not found
         friend class AsyncHashmap<C, void, HF>;
     public:
         AsyncHashmap<C, void, HF> &target;
@@ -2437,42 +2447,53 @@ public:
         uint32_t exitcode;
         ReadAccess(const AsyncHashmap<C, void, HF> &_target): target(const_cast<AsyncHashmap<C, void, HF>&>(_target)){}
         ~ReadAccess();
-        ReadAccess(const ReadAccess&)=delete;
+        ReadAccess(const ReadAccess&)=delete; ReadAccess& operator=(const ReadAccess&)= delete;
         ReadAccess(ReadAccess&&o): target(o.target), elem(o.elem), exitcode(o.exitcode){o.exitcode =0;}
-        ReadAccess& operator=(const ReadAccess&)= delete;
         ReadAccess& operator=(ReadAccess&&o){exitcode = o.exitcode; o.exitcode =0; elem = o.elem; target = o.target; return *this;}
+        void unlock(); // preemptively unlock target prior to destruction
 
         operator bool()const {return exitcode != 0;}
         const C* operator->(){return elem;}
         C operator*(){return *elem;}
-
     };
 
     class ConstIterator{
+        friend class AsyncHashmap<C, void, HF>;
     public:
         uint32_t i;
-        const AsyncHashmap<C, void, HF>& target;
-        ConstIterator(const AsyncHashmap<C, void, HF>& trg): target(trg){}
-        operator bool (){i =0; return (i != target.getSize());}
-        bool operator++(int){return (++i != target.getSize());}
-        typename ExCo<C>::INDEX_TYPE operator()()const{return target.deref_key(i);}
-        const C* operator->(){return &(target.darray[i]);}
-        C operator*(){return target.darray[i];}
+        AsyncHashmap<C, void, HF> &target;
+        uint32_t exitcode;
+        ConstIterator(const AsyncHashmap<C, void, HF>& trg): target(const_cast<AsyncHashmap<C, void, HF>&>(trg)), exitcode(0){}
+        ConstIterator(const ConstIterator& other)=delete; ConstIterator& operator=(const ConstIterator& other)=delete;
+        ConstIterator(ConstIterator&&o): target(o.target), exitcode(o.exitcode){o.exitcode =0;}
+        ConstIterator& operator=(ConstIterator&&o){target = o.targetl;exitcode = o.exitcode; o.exitcode =0;}
+        ~ConstIterator();
+        operator bool ();
+        bool operator++(int);
+
+        typename ExCo<C>::INDEX_TYPE operator()()const{return ExOp::getIndex(target.darray[i]);}
+        const C* operator->() const{return &(target.darray[i]);}
+        C operator*()const{return target.darray[i];}
 	};
-	// TODO
+
     ConstIterator getIterator() const {return ConstIterator(*this);}
     //ReadAccess operator()(const typename ExCo<C>::INDEX_TYPE &key); // find (blocking: can only be used by thread owning the structure)
-
+    uint32_t queryChunkIO(){return chunkIO.fetch_add(0);}
 
 
     // DONE
     void insert(C && newelem);
     WriteAccess operator[](const typename ExCo<C>::INDEX_TYPE &key); // find Or create, (blocking: can only be used by thread owning the structure)
+    ReadAccess operator[](const typename ExCo<C>::INDEX_TYPE &key) const;
+    ReadAccess read(const typename ExCo<C>::INDEX_TYPE &key) const;
+
     uint32_t getSize()const{return asize;}
     bool doesContain(const typename ExCo<C>::INDEX_TYPE &key) const;
     ReadAccess tryRead(const typename ExCo<C>::INDEX_TYPE &key) const;
     WriteAccess tryWrite(const typename ExCo<C>::INDEX_TYPE &key);
     WriteAccess tryCreate(const typename ExCo<C>::INDEX_TYPE &key);
+
+    void remove(const typename ExCo<C>::INDEX_TYPE &key);
 
     //uint32_t find_routine(typename ExCo<C>::INDEX_TYPE &key);
 
@@ -2482,6 +2503,9 @@ public:
     // DEBUG
     uint32_t getChunk_please()const{return chunkIO;}
     void show(FILE *f= stdout, int level =0)const;
+
+
+    void testThisDataStructure(uint32_t nbthreads=32, uint32_t nbitems=17000, uint32_t noisythread = 0xFFFFFFFF); // does some test, insert/removes
 
 };
 
@@ -2908,6 +2932,7 @@ public:
     std::thread** thrds;
     uint32_t nbactive;
     std::vector< std::thread  > futures;
+    //std::Vector< KeyElem<std::thread::id, string> > thrname;
     std::thread::id mainthreadid;
 
     uint32_t async_progress_maintain;
@@ -2917,7 +2942,7 @@ public:
     ProgressBarPrint progb;
     myHashmap<string,bool> flags; // wannabe anything!
     HeapTree<string, 3> msgs;
-
+    FILE* log;
 
     ThreadBase();
     ~ThreadBase();
@@ -2930,17 +2955,24 @@ public:
     void startThreads(uint32_t nbthreads = std::thread::hardware_concurrency());
     void stopThreads();
 
-    std::mutex& accessFinalMutex(){return final_mutex;} // *must the guarrantied to not lock anything else*
-    std::condition_variable& accessFinalCondvar(){return final_condvar;} // *must the guarrantied to not lock anything else*
+    std::mutex& accessFinalMutex(){return final_mutex;} // *must the guarantied to not lock anything else or block*
+    std::condition_variable& accessFinalCondvar(){return final_condvar;} // *must the guarantied to not lock anything else or block*
+
+
 
 
     int print(const char* str, ...);
+    int fprintf(FILE* f,const char* str, ...); // concurrent protected printf
+    int fprintf_l(FILE* f, const char* str, ...); // ASSUMES final mutex is Already locked, if f == NULL uses log!
+    int printLog(const char* str, ...); // ASSUMES final mutex is unlocked
+    int printLogF(const char* str, ...); // ASSUMES final mutex is Already locked
+
     void terminate(const char* str, ...);
 
 
     void flushMsgs(FILE* f = stdout);
     void joinAll();
-    FILE* exitlog(const char* str){running = false; FILE* f =fopen("error.log", "w+"); fprintf(f, "Error %s\n", str); msgs.insert(string("Created error log for: ") + string(str)) ; return f;}
+    FILE* exitlog(const char* str){running = false; FILE* f =fopen("error.log", "w+"); std::fprintf(f, "Error %s\n", str); msgs.insert(string("Created error log for: ") + string(str)) ; return f;}
     bool isRunning()const{return running;}
 
 
