@@ -7,7 +7,7 @@ class DefaultRessourceLoader : public LFHDisplay::RessourceLoader{
     GLuint textures[10];
 
     DefaultRessourceLoader();
-    void loadTexture(char* path, GLuint& where, int flag);
+    void loadTexture(const char* path, GLuint& where, int flag);
     void useTexture(const uint32_t);
     void useSound(const uint32_t);
     void useTextureExt(uint32_t);
@@ -27,7 +27,7 @@ class Task : public LFHPrimitive::ArgumentParser, public LFHDisplay::ProcessStat
         int OnKeyUp(const SDL_KeyboardEvent& Event); //OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
         int OnMaintain();//OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
         int listen(LFHDisplay::GUImessage&);
-	void draw(MyWindow*);
-	void drawAlias(MyWindow*);
+	void draw(LFHDisplay::MyWindow*);
+	void drawAlias(LFHDisplay::MyWindow*);
 };
 
