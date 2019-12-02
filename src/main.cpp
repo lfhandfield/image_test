@@ -78,12 +78,12 @@ void Task::nbaddtoken(char const * const token, int& min, int& max){
     }
 }
 void Task::store(char* const * token, int nbtoken){
-    switch(*token){
+    /*switch(*token){
     case 'o': min =1; break;
-    }
+    }*/
 }
 void Task::help(){
-        printf("Makes an Tiff file from a Tiff file, performing some basic operation.\n");
+        printf("This makes a interactive 3D overlay.\n");
         printf("Arguments: [2]\n");
         printf("        (in file) input tif image\n");
         printf("        (in file) output tif image\n");
@@ -100,13 +100,13 @@ int Task::OnMaintain(){//OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event
     dawin->render();
 return(0);}
 int Task::OnKeyDown(const SDL_KeyboardEvent& event){ //OnKeyDown(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
-    switch(event.keysym.sym){
+    /*switch(event.keysym.sym){
     case '3':{ //:
 
     }break;//:
     default:
     ffr->makeDefault();
-    }
+    }*/
 return(0);}
 int Task::OnKeyUp(const SDL_KeyboardEvent& event){ //OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
 return(0);}
@@ -116,11 +116,11 @@ void Task::draw(LFHDisplay::MyWindow*){
 }
 void Task::drawAlias(LFHDisplay::MyWindow*){
 }
-int Tasksdefstore(char* const * token, int nbtoken){
+int Tasks::defstore(char* const * token, int nbtoken){
     if (!LFHDisplay::Controlstate::init_SDL(NULL,NULL)) return 1;
     if (!LFHDisplay::Controlstate::init_openGL()) return 1;
     LFHDisplay::ctrl_state << this;
-    dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,RELPOS_RIGHT,false, 0);
+    dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,LFHDisplay::RELPOS_RIGHT,false, 0);
     LFHDisplay::ctrl_state.curwin = dawin;
     
     (*LFHDisplay::ctrl_state.curwin) << *this;
