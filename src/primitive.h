@@ -1526,7 +1526,7 @@ public:
 	FILE* f;
 	bool inv;
 	Vector<unsigned char> curflaglist;
-	TiffFile(const char*, bool writeonly = false); // erase file if present
+	TiffFile(const char*, char mode = 'd'); // 'r' readonly, 'w' will overwrite file erase file if present
 	~TiffFile();
 	unsigned int curfp_pos;
 	unsigned int endfile_pos;
