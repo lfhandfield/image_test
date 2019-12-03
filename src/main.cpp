@@ -7,10 +7,10 @@ DefaultRessourceLoader::DefaultRessourceLoader(){
     this->loadTexture("/opt/display/Images/guibuttn.tif", textures[3], 0);
     this->loadTexture("/opt/display/Images/guiicons.tif", textures[4], 0);
     this->loadTexture("/opt/display/Images/palette0.tif", textures[5], 0);
-    this->loadTexture("/opt/display/Images/guitexts.tif", textures[6], 0);
-    this->loadTexture("/opt/display/Images/guibgrid.tif", textures[7], 0);
-    this->loadTexture("/opt/display/Images/guigrmsk.tif", textures[8], 0);
-    this->loadTexture("/opt/display/Images/gtoolbar.tif", textures[9], 0);
+    //this->loadTexture("/opt/display/Images/guitexts.tif", textures[6], 0);
+    //this->loadTexture("/opt/display/Images/guibgrid.tif", textures[7], 0);
+    //this->loadTexture("/opt/display/Images/guigrmsk.tif", textures[8], 0);
+    //this->loadTexture("/opt/display/Images/gtoolbar.tif", textures[9], 0);
 }
 
 void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int flag){
@@ -122,11 +122,15 @@ int Task::defstore(char* const * token, int nbtoken){
     LFHDisplay::ctrl_state << this;
     dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,LFHDisplay::RELPOS_RIGHT,false, 0);
     LFHDisplay::ctrl_state.curwin = dawin;
-    
+    LFH_ALIVE;
     (*LFHDisplay::ctrl_state.curwin) << this;
+	    LFH_ALIVE;
     DefaultRessourceLoader* resl = new DefaultRessourceLoader();
+	    LFH_ALIVE;
     LFHDisplay::ctrl_state.main_control_loop(resl);
+	    LFH_ALIVE;
     delete(resl);
+	   LFH_ALIVE;
 return 0;}
 
 
