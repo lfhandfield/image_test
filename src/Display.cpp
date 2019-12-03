@@ -2583,8 +2583,6 @@ glDrawBuffer(GL_NONE);*/
 	glDepthFunc(GL_LEQUAL);glEnable(GL_CULL_FACE);
     for(i=0;i<render_list.size();i++) render_list[i]->drawPostGUI(this);
 
-F
-
 //    if (wind_bit) wind_bit->draw(0,0);
      while(true){
         GLenum curerr;
