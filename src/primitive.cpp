@@ -2234,26 +2234,16 @@ TiffFile::~TiffFile(){if (f != NULL) fclose(f);}
 bool TiffFile::gotoNext(){
 	uint32_t i;
 	uint16_t s;
-	if (f == NULL) printf("impossible!\n");
-	LFH_ALIVE;
 	if (fseek(f, curfp_pos, SEEK_SET) != 0) return false;
-	LFH_ALIVE;
 	if (fread(&i,sizeof(uint32_t),1,f) != 1) return false;
-	LFH_ALIVE;
-	printf("where %i\n", i);
 	if (inv) ExOp::bytereverse(i);
 	if (i == 0) {fseek(f, -4 * sizeof(char), SEEK_CUR); return(false);}
 	fseek(f, i, SEEK_SET);
 	if (fread(&s,sizeof(uint16_t),1,f)  != 1) return false;
-	LFH_ALIVE;
 	if (inv) ExOp::bytereverse(s);
-	LFH_ALIVE;
 	curflaglist.setSize(s*12);
-	LFH_ALIVE;
 	fread(&(curflaglist[0]),sizeof(unsigned char),s*12,f);
-	LFH_ALIVE;
 	curfp_pos = i + (2+s*12)*sizeof(unsigned char);
-    LFH_ALIVE;
 return(true);}
 int TiffFile::flagType(int flagindex){
 	unsigned short type = (*(unsigned short*)&(curflaglist[flagindex*12+2]));
