@@ -122,6 +122,8 @@ bool Controlstate::init_openGL(){
 
     }*/
     #endif
+	
+	
     return true;
 }
 
@@ -177,6 +179,18 @@ bool Controlstate::init_SDL(const char* const name, const char* const prod){
         memcpy(ctrl_state.def_path, path, ctrl_state.def_path_start);
         SDL_free(path);
     }
+	
+	glewInit();
+	check_openGL();
+// Check for OpenGL 2.1
+if(!GLEW_VERSION_2_1) {
+	std::cout << "Error: OpenGL 2.1 not available" << std::endl;
+	return false;
+}
+
+SDL_WM_SetCaption("SDL OpenGL Shader Tester - OpenGL2.1 available",NULL);
+	
+	
     atexit(SDL_Quit);
     return true;
 }
