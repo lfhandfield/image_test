@@ -70,16 +70,19 @@ int main(int argc, char** argv){
 task(argc, argv);}
 
 Task::Task() : dd_menu((uint32_t)GUIID_MAIN_DROP,(uint32_t)GSTYID_TEXTBOX){
-   	LFHDisplay::ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(0,0.0f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(1,0.0f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(2,0.8f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(3,0.0f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[GSTYID_TEXTBOX].setBorderSizes(16,16);
+	LFH_ALIVE;
+   	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(0,0.0f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(1,0.0f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(2,0.8f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(3,0.0f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setBorderSizes(16,16);
+		LFH_ALIVE;
 	    dd_menu.rect[2] =312;
 	    dd_menu.rect[3] =212;
 	    dd_menu.setPositionRelativeTo(1,LFHDisplay::RELPOS_TL_CORNER,0,0);
+		LFH_ALIVE;
 	dawin->insertGUI(&dd_menu);
-
+	LFH_ALIVE;
         Vector<char*> listoptions;
             listoptions.push_back(cloneString("Save"));
             listoptions.push_back(cloneString("Use Shadow Camera (toggle)"));
@@ -88,7 +91,9 @@ Task::Task() : dd_menu((uint32_t)GUIID_MAIN_DROP,(uint32_t)GSTYID_TEXTBOX){
             listoptions.push_back(cloneString("Regen Pathing"));
             listoptions.push_back(cloneString("Icon Rotation"));
             listoptions.push_back(cloneString("Disable Lighting"));
+		LFH_ALIVE;
 	dd_menu.leachOptions(listoptions);	
+		LFH_ALIVE;
 }		
 void Task::nbaddtoken(char const * const token, int& min, int& max){
     switch(*token){
