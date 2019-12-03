@@ -12,7 +12,4 @@ COPY Makefile /opt/display/Makefile
 RUN ls
 RUN make
 ENV PATH="/opt/display/:${PATH}"
-RUN echo Image created
-ENV PATH="/opt/display/:${PATH}"
-RUN ./helloworld
 CMD ["helloworld"]
