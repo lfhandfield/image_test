@@ -1035,11 +1035,13 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
 	tooltipalias = 0;
     stringCapture_cur = 0x1000;
     stringCapture_endptr = 0x1000;
+LFH_ALIVE;
     ctrl_state.compiledefaultshaders();
-    ctrl_state.create_latent_thread();
+LFH_ALIVE;
+	ctrl_state.create_latent_thread();
 	int i,gui_out;
 	ctrl_state.mouse_coor[0] =0;ctrl_state.mouse_coor[1] =0;
-
+LFH_ALIVE;
     mouse_click_milli=0;
     last_mouse_button_event_time =0;
     ctrl_state.mouse_stencil =0;
@@ -1048,7 +1050,7 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
     ctrl_state.mouse_push_coor[0] =0; ctrl_state.mouse_push_coor[1] =0;
     ctrl_state.foreground_alias=0;
     ctrl_state.button_state=0;
-
+LFH_ALIVE;
 
 
 
@@ -1057,7 +1059,7 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
 	uint16_t* quad_buffer = new uint16_t[98304];
 	for(*/
 
-
+LFH_ALIVE;
     while(ctrl_state.states.size() != 0) {
         if (!thrbase.isRunning()) {
             thrbase.stopThreads();
@@ -1065,7 +1067,7 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
             break;
         }
         timequeue.runTo(SDL_GetTicks());
-
+LFH_ALIVE;
         d = ctrl_state.states.size();
         while(SDL_PollEvent(&event)) {
         switch(event.type) {
