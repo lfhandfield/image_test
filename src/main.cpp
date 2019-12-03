@@ -14,7 +14,7 @@ DefaultRessourceLoader::DefaultRessourceLoader(){
 }
 
 void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int flag){
-    LFHPrimitive::TiffFile tf(path);
+    LFHPrimitive::TiffFile tf(path, 'r');
 	LFHPrimitive::DataGrid<unsigned char, 3> im;
     Tuple<unsigned int,3> coooo; // tmp
 
