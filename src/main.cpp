@@ -69,8 +69,33 @@ int main(int argc, char** argv){
 	Task task;
 task(argc, argv);}
 
-Task::Task(){}
+Task::Task() : dd_menu((uint32_t)GUIID_MAIN_DROP,(uint32_t)GSTYID_TEXTBOX){}
+   	ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(0,0.0f,0.5f,1.0f);
+	ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(1,0.0f,0.5f,1.0f);
+	ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(2,0.8f,0.5f,1.0f);
+	ctrl_state.gui_styles[GSTYID_TEXTBOX].setColorHIS(3,0.0f,0.5f,1.0f);
+	ctrl_state.gui_styles[GSTYID_TEXTBOX].setBorderSizes(16,16);
+	    dd_menu.rect[2] =312;
+	    dd_menu.rect[3] =212;
+	    dd_menu.setPositionRelativeTo(1,RELPOS_TL_CORNER,0,0);
+	dawin->insertGUI(&dd_menu);
 
+        Vector<char*> listoptions;
+            listoptions.push_back(cloneString("Save"));
+            listoptions.push_back(cloneString("Use Shadow Camera (toggle)"));
+		listoptions.push_back(cloneString("Draw Unit Bounds (toggle)"));
+            listoptions.push_back(cloneString("Swap Area and Template"));
+            listoptions.push_back(cloneString("Regen Pathing"));
+            listoptions.push_back(cloneString("Icon Rotation"));
+            listoptions.push_back(cloneString("Disable Lighting"));
+	dd_menu.leachOptions(listoptions);
+		
+};
+
+enum GUIID_enum:{
+	GUIID_WINDOW=0,
+	GUIID_MAIN_DROP
+		
 void Task::nbaddtoken(char const * const token, int& min, int& max){
     switch(*token){
     case '\0':min =0; break;
