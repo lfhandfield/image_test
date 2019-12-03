@@ -2195,7 +2195,6 @@ int ArgumentParser::operator()(int nbargs, char * const * args, bool has_prog_na
 	}
 
 TiffFile::TiffFile(const char* path, char mode) : curfp_pos(4), endfile_pos(0){
-    FILE* f;
     if (path != NULL){
         switch(mode){
         case 'r':
@@ -2232,7 +2231,6 @@ TiffFile::TiffFile(const char* path, char mode) : curfp_pos(4), endfile_pos(0){
     } else f = NULL;
 }	
 TiffFile::~TiffFile(){if (f != NULL) fclose(f);}
-
 bool TiffFile::gotoNext(){
 	uint32_t i;
 	uint16_t s;
