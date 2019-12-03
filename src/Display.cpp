@@ -127,15 +127,6 @@ bool Controlstate::init_openGL(){
     return true;
 }
 
-void Controlstate::check_openGL(){
-    const GLubyte* entry;
-    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
-}
-
 
 /*
 inline void
@@ -2253,6 +2244,17 @@ void GUIStyle::drawTextMesh(const GuiTextAttribute &texta, const int32_t* obrect
     glVertexAttribPointer(ATTRIBURE_CHARID,4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(float)*3+sizeof(char) * 4 , BUFFER_OFFSET(sizeof(float)*3));
     glDrawArrays(GL_QUADS, 0, texta.glbuffer_indexes[1]);
     }
+	
+	
+void Controlstate::check_openGL(){
+    const GLubyte* entry;
+    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
+}
+
 /** \brief Render text
  *
  * \param shaderID
@@ -2375,7 +2377,7 @@ void GUIStyle::setToMenuDefault(){
     if ((glcontext = SDL_GL_CreateContext(Surf_Display)) == NULL) myexit(SDL_GetError(void));
 
     SDL_GL_SetSwapInterval(1);
-	SDL_GL_MakeCurrent(window, glContext);
+	SDL_GL_MakeCurrent(Surf_Display, glcontext);
 		
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
