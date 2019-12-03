@@ -1,12 +1,19 @@
 #include "main.h"
 
 DefaultRessourceLoader::DefaultRessourceLoader(){
+LFH_ALIVE;
     this->loadTexture("/opt/display/Images/ft04data.tif", textures[0], 8);
+LFH_ALIVE;
     this->loadTexture("/opt/display/Images/ft04coor.tif", textures[1], 8);
+LFH_ALIVE;
     this->loadTexture("/opt/display/Images/guisbars.tif", textures[2], 0);
+LFH_ALIVE;
     this->loadTexture("/opt/display/Images/guibuttn.tif", textures[3], 0);
+LFH_ALIVE;
     this->loadTexture("/opt/display/Images/guiicons.tif", textures[4], 0);
+LFH_ALIVE;
     this->loadTexture("/opt/display/Images/palette0.tif", textures[5], 0);
+LFH_ALIVE;
     //this->loadTexture("/opt/display/Images/guitexts.tif", textures[6], 0);
     //this->loadTexture("/opt/display/Images/guibgrid.tif", textures[7], 0);
     //this->loadTexture("/opt/display/Images/guigrmsk.tif", textures[8], 0);
@@ -22,6 +29,7 @@ void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int fla
     glBindTexture(GL_TEXTURE_2D,slot);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+LFH_ALIVE;
 
     if (flag & 1){
         if (!tf.fetch(im)) {fprintf(stderr,"Found no frames in %s\n", path); exit(1);};
@@ -37,6 +45,8 @@ void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int fla
                 im.toresize_crude(ndim);
             }
         }
+	    LFH_ALIVE;
+
         switch(im.dims[0]){
         case 3:
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, im.dims[1], im.dims[2], 0, GL_RGB, GL_UNSIGNED_BYTE, im.data);
@@ -46,6 +56,7 @@ void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int fla
         break;
         }
     }
+LFH_ALIVE;
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
