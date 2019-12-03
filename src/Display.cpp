@@ -2246,14 +2246,7 @@ void GUIStyle::drawTextMesh(const GuiTextAttribute &texta, const int32_t* obrect
     }
 	
 	
-void Controlstate::check_openGL(){
-    const GLubyte* entry;
-    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
-}
+
 
 /** \brief Render text
  *
@@ -2311,7 +2304,15 @@ void GUIStyle::setToAreaDefault(){
 void GUIStyle::setToMenuDefault(){
 	setBorderSizes(64,64);
 }
-
+void Controlstate::check_openGL(){
+    const GLubyte* entry;
+    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
+}
+	
 	MyWindow::MyWindow(unsigned int alias, unsigned int style_alias, int sizex,int sizey, RELPOS_enum posis, bool full, int nCmdShow,const char* winname): GUIArea(alias,style_alias),isfullscr(full),last_mouse_depth(0.0){
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        8);
@@ -2391,7 +2392,13 @@ void GUIStyle::setToMenuDefault(){
         return 1;
     }
 		
-	check_openGL();
+    const GLubyte* entry;
+    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
+
 		
 		
 		
