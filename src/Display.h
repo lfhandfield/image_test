@@ -36,10 +36,16 @@
 
 //#include "./glad.h"
 
+// OpenGL / glew Headers
+#define GL3_PROTOTYPES 1
+#include <GL/glew.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
+// SDL2 Headers
+#include <SDL2/SDL.h>
+
+//#include <GL/gl.h>
+//#include <GL/glu.h>
+//#include <GL/glext.h>
 
 #define SHADER_STRINGIFY(V,A) "#version " #V "\n" #A
 //#define AL_AL_H
