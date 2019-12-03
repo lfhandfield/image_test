@@ -179,17 +179,7 @@ bool Controlstate::init_SDL(const char* const name, const char* const prod){
         memcpy(ctrl_state.def_path, path, ctrl_state.def_path_start);
         SDL_free(path);
     }
-	glewExperimental = GL_TRUE;
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	
-	glewInit();
-	check_openGL();
-// Check for OpenGL 2.1
-if(!GLEW_VERSION_2_1) {
-	std::cout << "Error: OpenGL 2.1 not available" << std::endl;
-	return false;
-}
+
 
 	
     atexit(SDL_Quit);
@@ -2385,7 +2375,24 @@ void GUIStyle::setToMenuDefault(){
     if ((glcontext = SDL_GL_CreateContext(Surf_Display)) == NULL) myexit(SDL_GetError(void));
 
     SDL_GL_SetSwapInterval(1);
-
+	SDL_GL_MakeCurrent(window, glContext);
+		
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	
+	//MUST make a context AND make it current BEFORE glewInit()!
+	glewExperimental = GL_TRUE;
+	GLenum glew_status = glewInit();
+	if (glew_status != 0) 
+    {
+		fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status));
+        return 1;
+    }
+		
+	check_openGL();
+		
+		
+		
     /*if(!gladLoadGL()) {
         printf("Something went wrong!\n");
         exit(-1);
@@ -2572,7 +2579,7 @@ glDrawBuffer(GL_NONE);*/
 	glDepthFunc(GL_LEQUAL);glEnable(GL_CULL_FACE);
     for(i=0;i<render_list.size();i++) render_list[i]->drawPostGUI(this);
 
-
+F
 
 //    if (wind_bit) wind_bit->draw(0,0);
      while(true){
