@@ -396,7 +396,6 @@ GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
 }
 
 void Controlstate::compiledefaultshaders(){
-   LFH_ALIVE;
 
      ctrl_state.datext_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
@@ -456,12 +455,10 @@ void Controlstate::compiledefaultshaders(){
             gl_FragColor = (fract(tmp.x * channel) < 0.5f) ? bgcolor : ((fract(tmp.y * channel) < 0.5f) ? fcolor: bcolor);
             }
     ),5, "datext_shader");
-   LFH_ALIVE;
     glUseProgram(datext_shader);
     glUniform1i(glGetUniformLocation(datext_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(datext_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(datext_shader, "tFontcoor"),1);
-   LFH_ALIVE;
 ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
     in vec4 chr_id;
@@ -514,12 +511,10 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = (fract(tmp.x * channel) < 0.5f) ? bgcolor : ((fract(tmp.y * channel) < 0.5f) ? fcolor: bcolor);
             }
     ),5, "datext2_shader");
-   LFH_ALIVE;
     glUseProgram(datext2_shader);
     glUniform1i(glGetUniformLocation(datext2_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(datext2_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(datext2_shader, "tFontcoor"),1);
-   LFH_ALIVE;
 
 
 
@@ -568,12 +563,10 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = icolor;
             }
     ),5, "sstext_shader");
-   LFH_ALIVE;
     glUseProgram(sstext_shader);
     glUniform1i(glGetUniformLocation(sstext_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(sstext_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(sstext_shader, "tFontcoor"),1);
-   LFH_ALIVE;
 
     ctrl_state.sstext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
@@ -618,12 +611,11 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = icolor;
             }
     ),5, "sstext2_shader");
-   LFH_ALIVE;
     glUseProgram(sstext2_shader);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tFontcoor"),1);
-   LFH_ALIVE;
+   
 
 
 /*
@@ -765,7 +757,7 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
     glUniform1i(glGetUniformLocation(daframe_shader, "tBackground"),2);
     glUniform1i(glGetUniformLocation(daframe_shader, "tBorder"),0);
     glUniform1i(glGetUniformLocation(daframe_shader, "tPalette"),1);
-   LFH_ALIVE;
+   
 
 //            lt.x = (gl_FragCoord.x < boundrect.x + 32* bordersize) ? 0.5 + 0.0078125 * (gl_FragCoord.x - boundrect.x) / bordersize : ((gl_FragCoord.x + 32* bordersize> boundrect.z) ? 1.0 - 0.0078125 * (boundrect.z - gl_FragCoord.x) / bordersize:  0.5 * fract(0.015625 * gl_FragCoord.x));
 
@@ -965,7 +957,7 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
     glUseProgram(daicon_alias_shader);
     glUniform1i(glGetUniformLocation(daicon_alias_shader, "tMotif"),0);
     glUniform1i(glGetUniformLocation(daicon_alias_shader, "tMask"),1);
-   LFH_ALIVE;
+   
     ctrl_state.daheat_shader = ctrl_state.compileshader_routine( SHADER_STRINGIFY(130,
 //\#version 130
     uniform vec4 boundrect;
@@ -1008,10 +1000,10 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
 			gl_FragColor = mix(vec4(palUV.y * 4,palUV.y * 4,palUV.y * 4,1.0f), texture(tPalette, palUV.xy), palUV.z);
             }
     ),"daheat_shader");
-   LFH_ALIVE;
+   
     glUseProgram(daheat_shader);
     glUniform1i(glGetUniformLocation(daheat_shader, "tPalette"),0);
-   LFH_ALIVE;
+   
 }
 void Controlstate::create_latent_thread(){
 }
@@ -1034,13 +1026,13 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
 	tooltipalias = 0;
     stringCapture_cur = 0x1000;
     stringCapture_endptr = 0x1000;
-LFH_ALIVE;
+
     ctrl_state.compiledefaultshaders();
-LFH_ALIVE;
+
 	ctrl_state.create_latent_thread();
 	int i,gui_out;
 	ctrl_state.mouse_coor[0] =0;ctrl_state.mouse_coor[1] =0;
-LFH_ALIVE;
+
     mouse_click_milli=0;
     last_mouse_button_event_time =0;
     ctrl_state.mouse_stencil =0;
@@ -1049,7 +1041,7 @@ LFH_ALIVE;
     ctrl_state.mouse_push_coor[0] =0; ctrl_state.mouse_push_coor[1] =0;
     ctrl_state.foreground_alias=0;
     ctrl_state.button_state=0;
-LFH_ALIVE;
+
 
 
 
@@ -1058,7 +1050,7 @@ LFH_ALIVE;
 	uint16_t* quad_buffer = new uint16_t[98304];
 	for(*/
 
-LFH_ALIVE;
+
     while(ctrl_state.states.size() != 0) {
         if (!thrbase.isRunning()) {
             thrbase.stopThreads();
@@ -1066,7 +1058,7 @@ LFH_ALIVE;
             break;
         }
         timequeue.runTo(SDL_GetTicks());
-LFH_ALIVE;
+
         d = ctrl_state.states.size();
         while(SDL_PollEvent(&event)) {
         switch(event.type) {
