@@ -17,8 +17,8 @@ class DefaultRessourceLoader : public LFHDisplay::RessourceLoader{
 
 #define TASK_MEMBER_DEFINITIONS int defstore(char* const * token, int nbtoken); void store(char* const * token, int nbtoken); void nbaddtoken(char const * const token, int& min, int& max); void help();
 
-enum STYLS_enum{
-	STYLS_DEFAULT
+enum GSTYID_enum{
+	GSTYID_TEXTBOX
 };
 
 enum GUIID_enum:{
