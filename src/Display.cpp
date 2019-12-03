@@ -2415,7 +2415,7 @@ target? is the location where the framebuffer object is bound. To set the width,
     framebufferID[0] = 0;
     framebufferID[1] = 0;
     framebufferID[2] = 0;
-
+LFH_ALIVE;
     if (glGenFramebuffers != NULL) {
     if (glFramebufferTexture2D  == NULL) myexit("No extern frame buffer texture!");
         glGenFramebuffers(3, framebufferID);
@@ -2424,6 +2424,7 @@ target? is the location where the framebuffer object is bound. To set the width,
             if (framebufferID[i] == 0) {printf("Could not allocate framebuffer no%i\n", i); ExOp::show(framebufferID); exit(1);}
         }
     }
+		LFH_ALIVE;
 //    glGenTextures(1,&renderbufferID);
 
     last_mouse_ddepth[0] =0.0; // happy valgrind!
@@ -2433,7 +2434,7 @@ target? is the location where the framebuffer object is bound. To set the width,
 
 
    // glGenRenderbuffers(1,&renderbufferID);
-
+LFH_ALIVE;
 	} //         	if (pcol.w &lt; 0.5) discard;
 /*
         	col *= (1.0 - fact);
