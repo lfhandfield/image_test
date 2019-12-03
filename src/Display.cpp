@@ -188,8 +188,6 @@ if(!GLEW_VERSION_2_1) {
 	return false;
 }
 
-SDL_WM_SetCaption("SDL OpenGL Shader Tester - OpenGL2.1 available",NULL);
-	
 	
     atexit(SDL_Quit);
     return true;
