@@ -315,7 +315,9 @@ GLuint Controlstate::compileshader_routine(const char * const vcode, const char 
     return(fout);
 }
 GLuint Controlstate::compileshader_advroutine(const char * const vcode, const char * const  code, unsigned int flag, const char * const name){
-    GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
+	if  (glCreateShader == NULL) {printf("glCreateShader is null!\n!!!!"); exit(1);}
+	
+GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
     GLuint davshade = glCreateShader(GL_VERTEX_SHADER);
     GLchar* tmp_code; unsigned int lenght;
     lenght= strlen(vcode)+1; tmp_code = new GLchar[lenght]; memcpy(tmp_code,vcode,lenght);
@@ -354,6 +356,7 @@ GLuint Controlstate::compileshader_advroutine(const char * const vcode, const ch
     glAttachShader(fout, davshade);
 //	if (glGetError()) {printf("error for %s:",name);printInfoLog(fout);}
     glAttachShader(fout, dashade);
+	if  (glBindAttribLocation == NULL) {printf("glBindAttribLocation is null!\n!!!!"); exit(1);}
  //   if (glGetError()) {printf("error for %s:",name);printInfoLog(fout);}
     glBindAttribLocation(fout,ATTRIBUTE_POSITION, "glcVertex");//printInfoLog(fout);
     if (flag & 1){
