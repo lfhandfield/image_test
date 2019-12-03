@@ -22,13 +22,10 @@ void DefaultRessourceLoader::loadTexture(const char* path, GLuint& slot, int fla
     glBindTexture(GL_TEXTURE_2D,slot);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-LFH_ALIVE;
-
     if (flag & 1){
         if (!tf.fetch(im)) {fprintf(stderr,"Found no frames in %s\n", path); exit(1);};
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, im.dims[1], im.dims[2], 0, GL_RED_INTEGER, GL_UNSIGNED_INT, im.data);
     }else{
-
         if (!tf.fetch(im)) {fprintf(stderr,"Found no frames in %s\n", path); exit(1);};
         if (im.dims[2] > 256){
             Tuple<unsigned int,3> ndim; GLint nsize;
@@ -38,7 +35,7 @@ LFH_ALIVE;
                 im.toresize_crude(ndim);
             }
         }
-	    LFH_ALIVE;
+	   
 
         switch(im.dims[0]){
         case 3:
@@ -49,7 +46,7 @@ LFH_ALIVE;
         break;
         }
     }
-LFH_ALIVE;
+
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -72,8 +69,7 @@ int main(int argc, char** argv){
 	Task task;
 task(argc, argv);}
 
-Task::Task(){
-}
+Task::Task(){}
 
 void Task::nbaddtoken(char const * const token, int& min, int& max){
     switch(*token){
