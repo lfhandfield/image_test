@@ -397,7 +397,7 @@ GLuint Controlstate::compileshader_advroutine(const char * const vcode, const ch
 }
 
 void Controlstate::compiledefaultshaders(){
-
+   LFH_ALIVE;
 
      ctrl_state.datext_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
@@ -457,12 +457,12 @@ void Controlstate::compiledefaultshaders(){
             gl_FragColor = (fract(tmp.x * channel) < 0.5f) ? bgcolor : ((fract(tmp.y * channel) < 0.5f) ? fcolor: bcolor);
             }
     ),5, "datext_shader");
-
+   LFH_ALIVE;
     glUseProgram(datext_shader);
     glUniform1i(glGetUniformLocation(datext_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(datext_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(datext_shader, "tFontcoor"),1);
-
+   LFH_ALIVE;
 ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
     in vec4 chr_id;
@@ -515,12 +515,12 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = (fract(tmp.x * channel) < 0.5f) ? bgcolor : ((fract(tmp.y * channel) < 0.5f) ? fcolor: bcolor);
             }
     ),5, "datext2_shader");
-
+   LFH_ALIVE;
     glUseProgram(datext2_shader);
     glUniform1i(glGetUniformLocation(datext2_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(datext2_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(datext2_shader, "tFontcoor"),1);
-
+   LFH_ALIVE;
 
 
 
@@ -569,12 +569,12 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = icolor;
             }
     ),5, "sstext_shader");
-
+   LFH_ALIVE;
     glUseProgram(sstext_shader);
     glUniform1i(glGetUniformLocation(sstext_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(sstext_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(sstext_shader, "tFontcoor"),1);
-
+   LFH_ALIVE;
 
     ctrl_state.sstext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
@@ -619,12 +619,12 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = icolor;
             }
     ),5, "sstext2_shader");
-
+   LFH_ALIVE;
     glUseProgram(sstext2_shader);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tFontcoor"),1);
-
+   LFH_ALIVE;
 
 
 /*
@@ -766,7 +766,7 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
     glUniform1i(glGetUniformLocation(daframe_shader, "tBackground"),2);
     glUniform1i(glGetUniformLocation(daframe_shader, "tBorder"),0);
     glUniform1i(glGetUniformLocation(daframe_shader, "tPalette"),1);
-
+   LFH_ALIVE;
 
 //            lt.x = (gl_FragCoord.x < boundrect.x + 32* bordersize) ? 0.5 + 0.0078125 * (gl_FragCoord.x - boundrect.x) / bordersize : ((gl_FragCoord.x + 32* bordersize> boundrect.z) ? 1.0 - 0.0078125 * (boundrect.z - gl_FragCoord.x) / bordersize:  0.5 * fract(0.015625 * gl_FragCoord.x));
 
@@ -966,7 +966,7 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
     glUseProgram(daicon_alias_shader);
     glUniform1i(glGetUniformLocation(daicon_alias_shader, "tMotif"),0);
     glUniform1i(glGetUniformLocation(daicon_alias_shader, "tMask"),1);
-
+   LFH_ALIVE;
     ctrl_state.daheat_shader = ctrl_state.compileshader_routine( SHADER_STRINGIFY(130,
 //\#version 130
     uniform vec4 boundrect;
@@ -1009,10 +1009,10 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
 			gl_FragColor = mix(vec4(palUV.y * 4,palUV.y * 4,palUV.y * 4,1.0f), texture(tPalette, palUV.xy), palUV.z);
             }
     ),"daheat_shader");
-
+   LFH_ALIVE;
     glUseProgram(daheat_shader);
     glUniform1i(glGetUniformLocation(daheat_shader, "tPalette"),0);
-
+   LFH_ALIVE;
 }
 void Controlstate::create_latent_thread(){
 }
@@ -2373,7 +2373,7 @@ void GUIStyle::setToMenuDefault(){
         exit(-1);
     }*/
 
-	LFH_ALIVE;
+
 	if (glClearColor == NULL) printf("function is still not linked...!!!\n");
   //  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   //  SDL_RenderClear(renderer);
@@ -2417,7 +2417,7 @@ target? is the location where the framebuffer object is bound. To set the width,
     framebufferID[0] = 0;
     framebufferID[1] = 0;
     framebufferID[2] = 0;
-LFH_ALIVE;
+
     if (glGenFramebuffers != NULL) {
     if (glFramebufferTexture2D  == NULL) myexit("No extern frame buffer texture!");
         glGenFramebuffers(3, framebufferID);
@@ -2426,7 +2426,7 @@ LFH_ALIVE;
             if (framebufferID[i] == 0) {printf("Could not allocate framebuffer no%i\n", i); ExOp::show(framebufferID); exit(1);}
         }
     }
-		LFH_ALIVE;
+
 //    glGenTextures(1,&renderbufferID);
 
     last_mouse_ddepth[0] =0.0; // happy valgrind!
@@ -2436,7 +2436,7 @@ LFH_ALIVE;
 
 
    // glGenRenderbuffers(1,&renderbufferID);
-LFH_ALIVE;
+
 	} //         	if (pcol.w &lt; 0.5) discard;
 /*
         	col *= (1.0 - fact);
