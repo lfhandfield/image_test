@@ -2386,12 +2386,7 @@ void Controlstate::check_openGL(){
 	//MUST make a context AND make it current BEFORE glewInit()!
 	glewExperimental = GL_TRUE;
 	GLenum glew_status = glewInit();
-	if (glew_status != 0) 
-    {
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status));
-        return 1;
-    }
-		
+	if (glew_status != 0) {fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status)); exit(1); }
     const GLubyte* entry;
     entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
     entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
