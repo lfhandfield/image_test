@@ -179,6 +179,9 @@ bool Controlstate::init_SDL(const char* const name, const char* const prod){
         memcpy(ctrl_state.def_path, path, ctrl_state.def_path_start);
         SDL_free(path);
     }
+	glewExperimental = GL_TRUE;
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	
 	glewInit();
 	check_openGL();
