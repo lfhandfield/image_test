@@ -34,7 +34,7 @@
 //#define GLFW_DLL
 //#include <GLFW/glfw3.h>
 
-#include "./glad.h"
+//#include "./glad.h"
 
 
 #include <GL/gl.h>
