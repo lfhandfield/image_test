@@ -11,5 +11,15 @@ COPY Images /opt/display/Images
 COPY Makefile /opt/display/Makefile
 RUN ls
 RUN make
+RUN R -e "install.packages('ggplot2',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('gridExtra',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('SingleCellExperiment',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('pheatmap',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('Seurat',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages('DEseq2',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages('scmap',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('M3Drop',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('rgl',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('gProfileR',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 ENV PATH="/opt/display/:${PATH}"
 CMD ["helloworld"]
