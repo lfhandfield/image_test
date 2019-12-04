@@ -21,5 +21,10 @@ RUN R -e "install.packages('scmap',dependencies=TRUE, repos='http://cran.rstudio
 RUN R -e "install.packages('M3Drop',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('rgl',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('gProfileR',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('monocle',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('grid',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('Rtsne',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('R.utils',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages('DropletUtils',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 ENV PATH="/opt/display/:${PATH}"
 CMD ["helloworld"]
