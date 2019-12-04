@@ -1,4 +1,4 @@
-FROM ubuntu 
+FROM bioconductor/release_base2
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update 
