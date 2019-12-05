@@ -12,6 +12,6 @@ COPY Makefile /opt/display/Makefile
 RUN make
 RUN R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatmap','R.utils', 'Rcpp', 'rgl'))" 
 RUN R -e "install.packages(c('Seurat', 'gProfileR','Rtsne'), repos='http://cran.rstudio.com/')"
-RUN R -e "BiocManager::install('SingleCellExperiment', 'scmap','M3Drop', 'monocle', 'DEseq2', 'DropletUtils')" 
+RUN R -e "BiocManager::install(c('SingleCellExperiment', 'scmap','M3Drop', 'monocle', 'DEseq2', 'DropletUtils'))" 
 ENV PATH="/opt/display/:${PATH}"
 CMD ["helloworld"]
