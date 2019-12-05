@@ -11,20 +11,10 @@ COPY Images /opt/display/Images
 COPY Makefile /opt/display/Makefile
 RUN ls
 RUN make
-RUN R -e "install.packages('ggplot2',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('gridExtra',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('SingleCellExperiment',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('pheatmap',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('Seurat',dependencies=TRUE, repos='http://cran.rstudio.com/')"
-RUN R -e "install.packages('DEseq2',dependencies=TRUE, repos='http://cran.rstudio.com/')"
-RUN R -e "install.packages('scmap',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('M3Drop',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatmap'),dependencies=TRUE, repos='http://cran.rstudio.com/')" 
+RUN R -e "install.packages(c('Seurat', 'gProfileR','Rtsne'), dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN R -e "BiocManager::install('SingleCellExperiment', 'scmap','M3Drop', 'monocle', 'DEseq2', 'DropletUtils')" 
 RUN R -e "install.packages('rgl',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('gProfileR',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('monocle',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('grid',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('Rtsne',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('R.utils',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('DropletUtils',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 ENV PATH="/opt/display/:${PATH}"
 CMD ["helloworld"]
