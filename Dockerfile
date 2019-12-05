@@ -9,12 +9,9 @@ WORKDIR /opt/display
 COPY src /opt/display/src
 COPY Images /opt/display/Images
 COPY Makefile /opt/display/Makefile
-RUN ls
 RUN make
-RUN R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatmap'),dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages(c('Seurat', 'gProfileR','Rtsne'), dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatmap','R.utils', 'Rcpp', 'rgl'))" 
+RUN R -e "install.packages(c('Seurat', 'gProfileR','Rtsne'), repos='http://cran.rstudio.com/')"
 RUN R -e "BiocManager::install('SingleCellExperiment', 'scmap','M3Drop', 'monocle', 'DEseq2', 'DropletUtils')" 
-RUN R -e "install.packages('rgl',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-RUN R -e "install.packages('R.utils',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 ENV PATH="/opt/display/:${PATH}"
 CMD ["helloworld"]
