@@ -12,6 +12,6 @@ WORKDIR /opt/display
 COPY src /opt/display/src
 COPY Images /opt/display/Images
 COPY Makefile /opt/display/Makefile
-#RUN make
-#ENV PATH="/opt/display/:${PATH}"
-#CMD ["helloworld"]
+RUN make
+ENV PATH="/opt/display/:${PATH}"
+CMD ["helloworld"]
