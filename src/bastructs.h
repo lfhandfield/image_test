@@ -2438,7 +2438,7 @@ public:
 
     class ReadAccess{
         bool find_only_routine(const typename ExCo<C>::INDEX_TYPE &key);
-        uint32_t find_read_routine(const typename ExCo<C>::INDEX_TYPE &key);
+        uint32_t find_read_syncroutine(const typename ExCo<C>::INDEX_TYPE &key);
         uint32_t block_routine(const typename ExCo<C>::INDEX_TYPE &key); // returns immediately if object is not found
         friend class AsyncHashmap<C, void, HF>;
     public:
@@ -2455,6 +2455,7 @@ public:
         operator bool()const {return exitcode != 0;}
         const C* operator->(){return elem;}
         C operator*(){return *elem;}
+        void remove(); // this bypass "const", use with care
     };
 
     class ConstIterator{
@@ -2484,8 +2485,9 @@ public:
     // DONE
     void insert(C && newelem);
     WriteAccess operator[](const typename ExCo<C>::INDEX_TYPE &key); // find Or create, (blocking: can only be used by thread owning the structure)
-    ReadAccess operator[](const typename ExCo<C>::INDEX_TYPE &key) const;
-    ReadAccess read(const typename ExCo<C>::INDEX_TYPE &key) const;
+inline ReadAccess operator[](const typename ExCo<C>::INDEX_TYPE &key) const{return this->read(key);}
+    ReadAccess read(const typename ExCo<C>::INDEX_TYPE &key) const; // if element does not exist, return invalid access
+    ReadAccess await(const typename ExCo<C>::INDEX_TYPE &key, atomic<int32_t>* exit_signal) const; // if element does not exist, BLOCKS until created by other thread!
 
     uint32_t getSize()const{return asize;}
     bool doesContain(const typename ExCo<C>::INDEX_TYPE &key) const;
@@ -2932,6 +2934,7 @@ public:
     std::thread** thrds;
     uint32_t nbactive;
     std::vector< std::thread  > futures;
+    myHashmap<uint32_t, std::thread* > dedicated;
     //std::Vector< KeyElem<std::thread::id, string> > thrname;
     std::thread::id mainthreadid;
 
@@ -2952,8 +2955,14 @@ public:
     ThreadBase& toSize(uint32_t s){this->toMemfree(); nbthreads = s; thrds = new std::thread*[nbthreads]; return *this;}
     void setSize(uint32_t s){this->toSize(s);}
 
-    void startThreads(uint32_t nbthreads = std::thread::hardware_concurrency());
-    void stopThreads();
+    ERRCODE startThread(uint32_t thdID, std::function<int (uint32_t)> fnc);
+
+
+    void startThreadArray(uint32_t nbthreads = std::thread::hardware_concurrency());
+    void stopThreadArray();
+
+    void joinThread(uint32_t thdID); // assumes thread is about to exit
+    void joinThreads(); // assumes all threads are about to exit
 
     std::mutex& accessFinalMutex(){return final_mutex;} // *must the guarantied to not lock anything else or block*
     std::condition_variable& accessFinalCondvar(){return final_condvar;} // *must the guarantied to not lock anything else or block*
@@ -2962,6 +2971,8 @@ public:
 
 
     int print(const char* str, ...);
+    int printf(const char* str, ...); // concurrent protected printf
+    int printf_l(const char* str, ...); // ASSUMES final mutex is Already locked, if f == NULL uses log!
     int fprintf(FILE* f,const char* str, ...); // concurrent protected printf
     int fprintf_l(FILE* f, const char* str, ...); // ASSUMES final mutex is Already locked, if f == NULL uses log!
     int printLog(const char* str, ...); // ASSUMES final mutex is unlocked
@@ -2971,7 +2982,9 @@ public:
 
 
     void flushMsgs(FILE* f = stdout);
+    void joinArray();
     void joinAll();
+
     FILE* exitlog(const char* str){running = false; FILE* f =fopen("error.log", "w+"); std::fprintf(f, "Error %s\n", str); msgs.insert(string("Created error log for: ") + string(str)) ; return f;}
     bool isRunning()const{return running;}
 

@@ -1526,7 +1526,7 @@ public:
 	FILE* f;
 	bool inv;
 	Vector<unsigned char> curflaglist;
-	TiffFile(const char*, char mode = 'd'); // 'r' readonly, 'w' will overwrite file erase file if present
+	TiffFile(const char*, bool writeonly = false); // erase file if present
 	~TiffFile();
 	unsigned int curfp_pos;
 	unsigned int endfile_pos;
@@ -2492,8 +2492,6 @@ public:
     template<class DATA, unsigned int TSIZE > void cluster_likelihood_ratio( const Vector< Tuple< WeightElem<DATA, 2> , TSIZE > > &data, NODE (*report)(const GaussElem< Tuple<DATA, TSIZE > > &,const GaussElem< Tuple<DATA, TSIZE > > &));
 
     template<class DATA, unsigned int TSIZE > void cluster_likelihood_ratio( const Vector< GaussElem< Tuple<DATA, TSIZE > > > &data, NODE (*report)(const GaussElem< Tuple<DATA, TSIZE > > &,const GaussElem< Tuple<DATA, TSIZE > > &));
-
-
 
     template<class DATA> void cluster_likelihood_ratio( const Vector< GaussElem< Tuple<DATA, 0u > > > &data);
 

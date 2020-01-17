@@ -32,7 +32,7 @@ LFHPrimitive::ThreadBase thrbase;
 ThreadBase::ThreadBase():nbactive(0), progb(20),async_progress_maintain(0xFFFFFFFF),nbthreads(0),running(true){
 }
 
-ThreadBase::~ThreadBase(){this->toMemfree(); stopThreads();}
+ThreadBase::~ThreadBase(){this->toMemfree(); stopThreadArray(); joinThreads();}
 ThreadBase& ThreadBase::toMemfree(){while(nbactive) {thrds[--nbactive]->join();delete(thrds[nbactive]);}
     if (nbthreads) {delete[](thrds); nbthreads = 0;}
 }
@@ -105,6 +105,19 @@ int ThreadBase::printLogF(const char *__format, ...) {
     int __res = std::vfprintf(log, __format, __va);
     va_end(__va);
     fflush(log);
+return __res;}
+int ThreadBase::printf(const char *__format, ...) {
+    std::unique_lock<std::mutex> lck(thrbase.accessFinalMutex());
+    va_list __va; va_start(__va, __format);
+    std::fprintf(stdout,"thr%X:", std::hash<std::thread::id>()(std::this_thread::get_id()) & 65535);
+    int __res = std::vfprintf(stdout, __format, __va);
+    va_end(__va);
+return __res;}
+int ThreadBase::printf_l(const char *__format, ...) {
+    va_list __va; va_start(__va, __format);
+    std::fprintf(stdout,"thr%X:", std::hash<std::thread::id>()(std::this_thread::get_id()) & 65535);
+    int __res = std::vfprintf(stdout,__format, __va);
+    va_end(__va);
 return __res;}
 int ThreadBase::fprintf(FILE* f, const char *__format, ...) {
     if (f == NULL) f = log;
@@ -187,8 +200,12 @@ void ThreadBase::joinAll(){
         }
     }*/
 }
-
-void ThreadBase::startThreads(uint32_t _nbthreads){
+ERRCODE ThreadBase::startThread(uint32_t thrID, std::function< int(uint32_t) > fnc){
+    if (dedicated.find(thrID) != 0xFFFFFFFF) return 1;
+    dedicated[thrID] = new std::thread(std::bind(fnc, thrID));
+return 0;}
+void ThreadBase::joinThread(uint32_t thrID){dedicated[thrID]->join(); delete(dedicated[thrID]); dedicated.erase(thrID);}
+void ThreadBase::startThreadArray(uint32_t _nbthreads){
     running = true;
     nbactivethr =0;
     nbthreads = _nbthreads;
@@ -197,12 +214,20 @@ void ThreadBase::startThreads(uint32_t _nbthreads){
     for(int i=0;i<_nbthreads;i++) futures.emplace_back(std::bind(&ThreadBase::operator(), std::ref(*this)));
     #endif // STDBINDFILTER
 }
-void ThreadBase::stopThreads(){
+void ThreadBase::stopThreadArray(){
     running = false;
     condvar.notify_all();
     fflush(stdout);
     for(int i=0;i<futures.size();i++) futures[i].join();
     futures.clear();
+    flushMsgs();
+}
+void ThreadBase::joinThreads(){
+    if (auto ite = dedicated.getIterator()) do{
+        (*ite)->join();
+        delete(*ite);
+    }while(ite++);
+    dedicated.toMemfree();
     flushMsgs();
 }
 void ThreadBase::flushMsgs(FILE *f){

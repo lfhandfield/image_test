@@ -4124,6 +4124,10 @@ LFHTEMP void AsyncHashmap<C,void,HF>::rehash(uint32_t _hsize){
         dahash[i] = dahash[j];
         dahash[j] = i;
     }
+    /*for(i=0;i< (hsize << 1);i++){
+        printf("H[%i]: %i\n",i, dahash[i]);
+
+    }*/
 }
 LFHTEMP uint32_t AsyncHashmap<C,void,HF>::find_routine(const typename ExCo<C>::INDEX_TYPE &key) const{
     if (asize == 0) return(0xFFFFFFFF);
@@ -4134,6 +4138,7 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::find_routine(const typename ExCo<C>::I
 return(j);}
 LFHTEMP void AsyncHashmap<C,void,HF>::delayed_remove_routine(const typename ExCo<C>::INDEX_TYPE &key, std::unique_lock<std::mutex> &lck){
     // just kidding, not deleting ^^'
+    //printf("delayed wait!\n"); fflush(stdout);
     uint32_t ind;
     thrbase.accessFinalCondvar().wait(lck,[this, key, &ind]{
             if (asize == 0) {ind = 0xFFFFFFFF; return true;}
@@ -4146,29 +4151,38 @@ LFHTEMP void AsyncHashmap<C,void,HF>::delayed_remove_routine(const typename ExCo
             return ((chunkIO & (3 << (((hsize >> 5) == 0) ?  (ind << 1) : ((ind / (hsize >> 5)) & 0x1E)))) == 0);
         });
     if (ind == 0xFFFFFFFF) return;
-    if (key != ExOp::getIndex(darray[ind])){
-        printf("crazy, did not match!\n");
-    }
-    uint32_t i = (HF::makeSeed(key) & (hsize-1)) | hsize;
-    uint32_t j = dahash[i];
-    if (j == ind) dahash[i] = dahash[j];
-    else{
-        while (dahash[j] != ind) j = dahash[j];
-        dahash[j] = dahash[ind];
-    }
-    moveEntry_routine(asize-1, ind);
-    asize--;
+    if (asize == 1){ // deleting the last one!
+            //printf("delay del last!\n"); fflush(stdout);
+        delete[](dahash);
+        delete[](darray);
+        asize =0;
+    }else{
+        //printf("delay del!"); fflush(stdout);
+        if (key != ExOp::getIndex(darray[ind])){
+            printf("crazy, did not match!\n");
+        }
+        uint32_t i = (HF::makeSeed(key) & (hsize-1)) | hsize;
+        uint32_t j = dahash[i];
+        if (j == ind) dahash[i] = dahash[j];
+        else{
+            while (dahash[j] != ind) j = dahash[j];
+            dahash[j] = dahash[ind];
+        }
+        moveEntry_routine(asize-1, ind);
+        asize--;
 
-    if (asize <= (hsize >> 2)){
-        //thrbase.fprintf_l(stdout,"Wants end (downalloc) chunkIO %X\n", (uint32_t) chunkIO);
-        thrbase.accessFinalCondvar().wait(lck,[this]{return (chunkIO==0)||(asize > (hsize >> 2));});
-        //thrbase.fprintf_l(stdout,"Woke up! chunkIO %X\n", (uint32_t)chunkIO);
         if (asize <= (hsize >> 2)){
-            C* swp = darray;
-            darray = new C[hsize >> 1];
-            for(i=0;i< asize; i++) ExOp::toMemmove(darray[i], swp[i]);
-            rehash(hsize >> 1);
-            delete[](swp);
+            //thrbase.fprintf_l(stdout,"Wants end (downalloc) chunkIO %X\n", (uint32_t) chunkIO);
+            thrbase.accessFinalCondvar().wait(lck,[this]{return (chunkIO==0)||(asize > (hsize >> 2));});
+            //thrbase.fprintf_l(stdout,"Woke up! chunkIO %X\n", (uint32_t)chunkIO);
+            if (asize <= (hsize >> 2)){
+                //printf("delay dadel downalloc!\n"); fflush(stdout);
+                C* swp = darray;
+                darray = new C[hsize >> 1];
+                for(i=0;i< asize; i++) ExOp::toMemmove(darray[i], swp[i]);
+                rehash(hsize >> 1);
+                delete[](swp);
+            }
         }
     }
 
@@ -4184,7 +4198,7 @@ LFHTEMP void AsyncHashmap<C,void,HF>::moveEntry_routine(uint32_t from, uint32_t 
         dahash[j] = to;
     }
     dahash[to] = dahash[from];
-    ExOp::toMemmove(darray[to], darray[from]);
+    darray[to] = std::move(darray[from]);
 }
 
 
@@ -4227,8 +4241,7 @@ LFHTEMP void AsyncHashmap<C,void,HF>::ReadAccess::unlock(){
     }
     exitcode =0;
 return(j != 0xFFFFFFFF);}*/
-LFHTEMP uint32_t AsyncHashmap<C,void,HF>::ReadAccess::find_read_routine(const typename ExCo<C>::INDEX_TYPE &key){
-    std::lock_guard<std::mutex> lck(thrbase.accessFinalMutex());
+LFHTEMP uint32_t AsyncHashmap<C,void,HF>::ReadAccess::find_read_syncroutine(const typename ExCo<C>::INDEX_TYPE &key){
     if (target.asize == 0) {exitcode = 0; return(0xFFFFFFFF);}
     uint32_t j = target.dahash[(HF::makeSeed(key) & (target.hsize-1)) | target.hsize];
     for(;j != 0xFFFFFFFF;j = target.dahash[j]){
@@ -4239,8 +4252,11 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::ReadAccess::find_read_routine(const ty
     else{
         exitcode = 1 << (((target.hsize >> 5) == 0) ?  (j << 1) : ((j / (target.hsize >> 5)) & 0x1E));
         uint32_t tmp = (exitcode | (exitcode << 1));
-        if ((target.chunkIO & tmp) != tmp) target.chunkIO.fetch_add(exitcode);
-        else exitcode = 0;
+        if ((target.chunkIO & tmp) == tmp) exitcode = 0;
+        else {
+            target.chunkIO.fetch_add(exitcode);
+            elem = target.darray + j;
+        }
     }
 return(j);}
 LFHTEMP uint32_t AsyncHashmap<C,void,HF>::WriteAccess::try_write_routine(const typename ExCo<C>::INDEX_TYPE &key){
@@ -4278,7 +4294,72 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::ReadAccess::block_routine(const typena
         target.chunkIO += exitcode;
     }
 return(j);}
+/* Delete entry from hashmap, needs to make sure no other reader exist
+ */
+LFHTEMP void AsyncHashmap<C,void,HF>::ReadAccess::remove(){
+     if (exitcode != 0){
+        // unlink from hash
+        {std::unique_lock<std::mutex> lck(thrbase.accessFinalMutex());
+            uint32_t i;
+            if (target.chunkIO & (exitcode << 1)){
+                // cant write...
+                target.chunkIO.fetch_sub(exitcode); exitcode =0;
+                thrbase.accessFinalCondvar().notify_all();
+                target.delayed_remove_routine(ExOp::getIndex(*elem), lck);
+                elem = NULL;
+                return;
+            }
 
+            // first try to swap/delete entry
+
+            if (target.asize == 1){
+                delete[](target.dahash);
+                delete[](target.darray);
+                target.asize =0;
+                //printf("dadel del last! %i %p %p L=%c\n", target.asize, target.dahash, target.darray, lck ? 'L' : 'U'); fflush(stdout);
+            }else{
+                // needs to lock entry and end of hash!
+                uint32_t endcode = 1 << (((target.hsize >> 5) == 0) ?  ((target.asize-1) << 1) : (((target.asize-1) / (target.hsize >> 5)) & 0x1E));
+                if ((endcode == exitcode)||((target.chunkIO & (endcode | (endcode << 1)) ) == 0)) {
+                    uint32_t ind = (uint32_t) (elem - target.darray);
+                    //printf("dadel read! %i\n", ind); fflush(stdout);
+                    if (ind != target.find_routine(ExOp::getIndex(*elem))) printf("Disagree for position!\n", ind, target.find_routine(ExOp::getIndex(*elem)));
+                    uint32_t j = target.dahash[i = ((HF::makeSeed(ExOp::getIndex(*elem)) & (target.hsize-1)) | target.hsize)];
+                    if (j == ind) target.dahash[i] = target.dahash[j];
+                    else{
+                        while (target.dahash[j] != ind) j = target.dahash[j];
+                        target.dahash[j] = target.dahash[ind];
+                    }
+                    target.moveEntry_routine(target.asize-1, ind);
+                    target.asize--;
+                    target.chunkIO.fetch_sub(exitcode); exitcode =0;
+                    thrbase.accessFinalCondvar().notify_all();
+                }else{ // cannot access end... need free it and to wait for it  and end of vector, implying remove is postponed!
+                    target.chunkIO.fetch_sub(exitcode); exitcode =0;
+                    thrbase.accessFinalCondvar().notify_all();
+                    target.delayed_remove_routine(ExOp::getIndex(*elem), lck);
+                    elem = NULL;
+                    return;
+                }
+                // cant exit if downalloc is needed
+                if (target.asize <= (target.hsize >> 2)){
+                    //thrbase.fprintf_l(stdout,"Wants end (downalloc) chunkIO %X\n", (uint32_t) target.chunkIO);
+                    thrbase.accessFinalCondvar().wait(lck,[this]{return (target.chunkIO==0)||(target.asize > (target.hsize >> 2));});
+                    //thrbase.fprintf_l(stdout,"Woke up! chunkIO %X\n", (uint32_t)target.chunkIO);
+                    if (target.asize <= (target.hsize >> 2)){
+                        //printf("dadel downalloc!\n"); fflush(stdout);
+                        C* swp = target.darray;
+                        target.darray = new C[target.hsize >> 1];
+                        for(i=0;i< target.asize; i++) target.darray[i] = std::move(swp[i]);
+                        target.rehash(target.hsize >> 1);
+                        delete[](swp);
+                    }
+                }
+            }
+            elem = NULL;
+        }
+    }
+}
 /* Delete entry from hashmap
  */
 LFHTEMP void AsyncHashmap<C,void,HF>::WriteAccess::remove(){
@@ -4298,6 +4379,7 @@ LFHTEMP void AsyncHashmap<C,void,HF>::WriteAccess::remove(){
                 uint32_t endcode = 3 << (((target.hsize >> 5) == 0) ?  ((target.asize-1) << 1) : (((target.asize-1) / (target.hsize >> 5)) & 0x1E));
                 if ((endcode == exitcode)||((target.chunkIO & endcode) == 0)) {
                     uint32_t ind = (uint32_t) (elem - target.darray);
+                    //printf("dadel write! %i\n", ind);
                     if (ind != target.find_routine(ExOp::getIndex(*elem))) printf("Disagree for position!\n", ind, target.find_routine(ExOp::getIndex(*elem)));
                     uint32_t j = target.dahash[i = ((HF::makeSeed(ExOp::getIndex(*elem)) & (target.hsize-1)) | target.hsize)];
                     if (j == ind) target.dahash[i] = target.dahash[j];
@@ -4444,6 +4526,8 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::block_create_routine(const typename Ex
     uint32_t j;
     do{
         if (asize == 0) {
+            //printf("created 1! %c\n", lck ? 'L' : 'U'); fflush(stdout);
+            //fflush(stdout);
             this->rehash(1);
             darray = new C[1];
             chunkIO = 0; angryIO =0;
@@ -4451,13 +4535,24 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::block_create_routine(const typename Ex
             break;
         }else if (asize == hsize){
             // need to upalloc!!!
+            //printf("upalloc time! %c\n", lck ? 'L' : 'U'); fflush(stdout);
             do{
                 if (chunkIO != 0) { // todo, make angry
                     //thrbase.fprintf_l(stdout,"Deadlockprone want everything got chunkIO %X\n", (uint32_t)chunkIO);
+                    //printf("sleep time! %c\n", lck ? 'L' : 'U'); fflush(stdout);
                     thrbase.accessFinalCondvar().wait(lck,[this]{return (chunkIO==0)||(asize !=  hsize);});
                     //thrbase.fprintf_l(stdout,"Woke up! got everything chunkIO %X\n", (uint32_t)chunkIO);
-                    if (asize != hsize) break; // some delete or up alloc happened
+                    if (asize < hsize) {
+                        //printf("something happened! %i\n", asize);
+                        if (asize == 0){
+                            this->rehash(1);
+                            darray = new C[1];
+                            chunkIO = 0; angryIO =0;
+                        }
+                        break;
+                    } // some delete or up alloc happened
                 }
+                //printf("all good! %i %i %c\n", asize, hsize, lck ? 'L' : 'U'); fflush(stdout);
                 this->rehash(hsize << 1);
                 C* swp = darray;
                 darray = new C[hsize];
@@ -4473,6 +4568,7 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::block_create_routine(const typename Ex
                 dahash[tj] = j;
                 return j;
             }while(false);
+
         }
         exitcode = 3 << (((hsize >> 5) == 0) ?  (asize << 1) : ((asize / (hsize >> 5)) & 0x1E));
         if ((chunkIO & exitcode) == 0) break;
@@ -4494,6 +4590,11 @@ LFHTEMP uint32_t AsyncHashmap<C,void,HF>::block_create_routine(const typename Ex
     uint32_t tj = (HF::makeSeed(key) & (hsize-1)) | hsize;
     dahash[j] = dahash[tj];
     dahash[tj] = j;
+    /*printf("created exity! %i %i %i %i %c\n", asize, hsize, tj, j, lck ? 'L' : 'U'); fflush(stdout);
+    for(int i=0;i< (hsize << 1);i++){
+        printf("H[%i]: %i\n",i, dahash[i]);
+    }*/
+    fflush(stdout);
 return j;}
 /*LFHTEMP uint32_t AsyncHashmap<C,void,HF>::find_create_routine(const typename ExCo<C>::INDEX_TYPE &key){
     std::lock_guard<std::mutex> lck(thrbase.accessFinalMutex());
@@ -4527,13 +4628,17 @@ LFHTEMP typename AsyncHashmap<C,void,HF>::WriteAccess AsyncHashmap<C,void,HF>::o
     //printf("daind%i%i%i%idniad\n", ind, ind, ind, ind);
     fout.elem = darray + ind;
 return fout;}
-LFHTEMP typename AsyncHashmap<C,void,HF>::ReadAccess AsyncHashmap<C,void,HF>::operator[](const typename ExCo<C>::INDEX_TYPE &key)const{ typename AsyncHashmap<C,void,HF>::ReadAccess fout(*this);
-    uint32_t ind = fout.block_routine(key);
-    if (ind != 0xFFFFFFFF) fout.elem = darray + ind;
-return fout;}
 LFHTEMP typename AsyncHashmap<C,void,HF>::ReadAccess AsyncHashmap<C,void,HF>::read(const typename ExCo<C>::INDEX_TYPE &key)const{ typename AsyncHashmap<C,void,HF>::ReadAccess fout(*this);
     uint32_t ind = fout.block_routine(key);
     if (ind != 0xFFFFFFFF) fout.elem = darray + ind;
+return fout;}
+
+LFHTEMP typename AsyncHashmap<C,void,HF>::ReadAccess AsyncHashmap<C,void,HF>::await(const typename ExCo<C>::INDEX_TYPE &key, atomic<int32_t>* can_block_flag) const{typename AsyncHashmap<C,void,HF>::ReadAccess fout(*this);
+    std::unique_lock<std::mutex> lck(thrbase.accessFinalMutex());
+    fout.find_read_syncroutine(key);
+    if (fout.exitcode != 0) return fout;
+    // does not exist, wait for it!
+    if (0 == (int32_t) *can_block_flag) thrbase.accessFinalCondvar().wait(lck,[&fout, &key, can_block_flag]{fout.find_read_syncroutine(key);return (fout.exitcode != 0)||(0 != (int32_t) *can_block_flag);});
 return fout;}
 
 LFHTEMP void AsyncHashmap<C,void,HF>::insert(C && newelem){ typename AsyncHashmap<C,void,HF>::WriteAccess fout(*this);
@@ -4545,8 +4650,8 @@ LFHTEMP bool AsyncHashmap<C,void,HF>::doesContain(const typename ExCo<C>::INDEX_
     std::unique_lock<std::mutex> lck(thrbase.accessFinalMutex());
 return this->find_routine(key)!= 0xFFFFFFFF;}
 LFHTEMP typename AsyncHashmap<C,void,HF>::ReadAccess AsyncHashmap<C,void,HF>::tryRead(const typename ExCo<C>::INDEX_TYPE &key) const{ typename AsyncHashmap<C,void,HF>::ReadAccess fout(*this);
-    uint32_t ind = fout.find_read_routine(key);
-    fout.elem = (fout.exitcode == 0) ? nullptr : darray + ind;
+    std::lock_guard<std::mutex> lck(thrbase.accessFinalMutex());
+    uint32_t ind = fout.find_read_syncroutine(key);
 return fout;}
 LFHTEMP typename AsyncHashmap<C,void,HF>::WriteAccess AsyncHashmap<C,void,HF>::tryWrite(const typename ExCo<C>::INDEX_TYPE &key){ typename AsyncHashmap<C,void,HF>::WriteAccess fout(*this);
     uint32_t ind = fout.try_write_routine(key);
@@ -4708,7 +4813,7 @@ LFHTEMP void AsyncHashmap<C,void,HF>::testThisDataStructure(uint32_t nbthreads, 
     lotask.iteratortrap =0;
     lotask.noisythread = noisythread;
     lotask.mask = (lotask.nbnastythreads >> 1)-1; ExOp::toLeftFlood(lotask.mask);
-    thrbase.startThreads(nbthreads);
+    thrbase.startThreadArray(nbthreads);
     printf("Doing this with %i threads (mask %X)\n",thrbase.nbthreads, lotask.mask);
 
     thrbase.startProgress("Lets do this!", lotask.nbnastythreads * lotask.nbitems);

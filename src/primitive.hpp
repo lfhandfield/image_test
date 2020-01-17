@@ -3362,167 +3362,166 @@ LFHTEMP void DomainMappedTuple<C,D,LFHDOMAINMAP_ZERO_TO_ONE>::applyUpdate(Tuple<
 		return(true);
 	}
 
-	template <class C>
-	bool TiffFile::fetch(DataGrid<C,2>& f_out, const unsigned int channel){
-		//		char buffer[65536];
-		unsigned int i,j,k;
-        uint32_t rout;
+template <class C> bool TiffFile::fetch(DataGrid<C,2>& f_out, const unsigned int channel){
+    //		char buffer[65536];
+    unsigned int i,j,k;
+    uint32_t rout;
 
-		typedef class DataGrid<C,2>::KeyIterator itetype;
-		itetype ite = f_out.getKeyIterator();
+    typedef class DataGrid<C,2>::KeyIterator itetype;
+    itetype ite = f_out.getKeyIterator();
 
 
-		unsigned int size[3];
-		unsigned int stripro;
+    unsigned int size[3];
+    unsigned int stripro;
 
-		vector<unsigned int> stripof, stripco;
-		unsigned int required;
-		unsigned int unitsize;
-		unsigned int type =1;
-		unsigned short tmpflag;
-		int tmp_iscompressed;
-		if (!gotoNext()) return(false);
-        required =0; size[0] = 1;
-        for(i=0;i<curflaglist.getSize()/12;i++){
-            //	printf("flagtype %i\n", *(unsigned short*)&(curflaglist[i*12])); fflush(stdout);
-            tmpflag = *(unsigned short*)&(curflaglist[i*12]);
-            if (inv) ExOp::bytereverse(tmpflag);
+    vector<unsigned int> stripof, stripco;
+    unsigned int required;
+    unsigned int unitsize;
+    unsigned int type =1;
+    unsigned short tmpflag;
+    int tmp_iscompressed;
+    if (!gotoNext()) return(false);
+    required =0; size[0] = 1;
+    for(i=0;i<curflaglist.getSize()/12;i++){
+        //	printf("flagtype %i\n", *(unsigned short*)&(curflaglist[i*12])); fflush(stdout);
+        tmpflag = *(unsigned short*)&(curflaglist[i*12]);
+        if (inv) ExOp::bytereverse(tmpflag);
 
-            switch (tmpflag){
-                case 256: size[1] = getValue<unsigned int>(i); required |= 1; break;//memcpy(buffer+512,"ImageWidth",sizeof(char)*11);break;
-                case 257: size[2] = getValue<unsigned int>(i); required |= 2;break;//memcpy(buffer+512,"ImageHeight",sizeof(char)*12);break;
-                case TIFFFLAG_Compression: tmp_iscompressed = getValue<int>(i); if ((tmp_iscompressed != 0)&&(tmp_iscompressed != 1)) {fprintf(stderr,"Tiff file is saved in a compressed format (compress code:%i), it needs to be uncompressed.\n",tmp_iscompressed&0xFFFF);  exit(1);} break;
-                case 258: unitsize = getValue<unsigned int>(i); break;
-                case 273: stripof = getValue< vector<unsigned int> >(i); required |= 8;break;//memcpy(buffer+512,"SkipOffsets",sizeof(char)*12);break;
-                case 277: size[0] = getValue<unsigned int>(i); break;//memcpy(buffer+512,"SamplesPerPixel",sizeof(char)*16);break;
-                case 278: stripro= getValue<unsigned int>(i); required |= 16;break;//memcpy(buffer+512,"RowsPerStrip",sizeof(char)*13);break;
-                case 279: stripco= getValue< vector<unsigned int> >(i); required |= 32;break;//memcpy(buffer+512,"StripByteCounts",sizeof(char)*16);break;
-                case 339: type = getValue<unsigned int>(i);	break; //SampleFormat
-                //default: /*printf("got flag %i\n", tmpflag);*/
-            }
+        switch (tmpflag){
+            case 256: size[1] = getValue<unsigned int>(i); required |= 1; break;//memcpy(buffer+512,"ImageWidth",sizeof(char)*11);break;
+            case 257: size[2] = getValue<unsigned int>(i); required |= 2;break;//memcpy(buffer+512,"ImageHeight",sizeof(char)*12);break;
+            case TIFFFLAG_Compression: tmp_iscompressed = getValue<int>(i); if ((tmp_iscompressed != 0)&&(tmp_iscompressed != 1)) {fprintf(stderr,"Tiff file is saved in a compressed format (compress code:%i), it needs to be uncompressed.\n",tmp_iscompressed&0xFFFF);  exit(1);} break;
+            case 258: unitsize = getValue<unsigned int>(i); break;
+            case 273: stripof = getValue< vector<unsigned int> >(i); required |= 8;break;//memcpy(buffer+512,"SkipOffsets",sizeof(char)*12);break;
+            case 277: size[0] = getValue<unsigned int>(i); break;//memcpy(buffer+512,"SamplesPerPixel",sizeof(char)*16);break;
+            case 278: stripro= getValue<unsigned int>(i); required |= 16;break;//memcpy(buffer+512,"RowsPerStrip",sizeof(char)*13);break;
+            case 279: stripco= getValue< vector<unsigned int> >(i); required |= 32;break;//memcpy(buffer+512,"StripByteCounts",sizeof(char)*16);break;
+            case 339: type = getValue<unsigned int>(i);	break; //SampleFormat
+            //default: /*printf("got flag %i\n", tmpflag);*/
         }
-        if (required == 59){
-            f_out.setSizes(size+1);
-            //	printf("%i,,,%i,,,%i\n",stripro, size[2] ,stripco.getSize());
-            k = stripro * size[1]* size[0];
-            j=i=0;
-            i--;
-            switch(type){
-                case 1: // unsigned int
-                    if (unitsize == sizeof(unsigned char)*8){
-                        //printf("RecognizedQ unsigned char!\n");
-                        { //:
-                            unsigned char* buffer = new unsigned char[stripro * size[1]];
+    }
+    if (required == 59){
+        f_out.setSizes(size+1);
+        //	printf("%i,,,%i,,,%i\n",stripro, size[2] ,stripco.getSize());
+        k = stripro * size[1]* size[0];
+        j=i=0;
+        i--;
+        switch(type){
+            case 1: // unsigned int
+                if (unitsize == sizeof(unsigned char)*8){
+                    //printf("RecognizedQ unsigned char!\n");
+                    { //:
+                        unsigned char* buffer = new unsigned char[stripro * size[1]];
 
-                            if (ite.first()) do{
-                                if (k >= stripro * size[1]* size[0]){
-                                    i++;
-                                    fseek(f,stripof[i],SEEK_SET);
-                                    if (size[0] == 1) {
-                                        if ((rout = fread(buffer,sizeof(unsigned char), stripro * size[1],f)) != stripro * size[1]) return false;
-                                    }else{
+                        if (ite.first()) do{
+                            if (k >= stripro * size[1]* size[0]){
+                                i++;
+                                fseek(f,stripof[i],SEEK_SET);
+                                if (size[0] == 1) {
+                                    if ((rout = fread(buffer,sizeof(unsigned char), stripro * size[1],f)) != stripro * size[1]) return false;
+                                }else{
 
-                                    }
-                                    k=0;
                                 }
-                                f_out.data[j++] = (C) buffer[k++];
-                            } while(ite.next());
-                            delete[](buffer);
+                                k=0;
+                            }
+                            f_out.data[j++] = (C) buffer[k++];
+                        } while(ite.next());
+                        delete[](buffer);
 
-                        } //:
-                    }else if (unitsize == sizeof(unsigned short)*8){
-                        { //:
-                            //printf("RecognizedQ unsigned short!\n");
+                    } //:
+                }else if (unitsize == sizeof(unsigned short)*8){
+                    { //:
+                        //printf("RecognizedQ unsigned short!\n");
 
-                            unsigned short* buffer = new unsigned short[stripro * size[1]];
-                            if (ite.first()) do{
-                                if (k >= stripro * size[1]* size[0]){
-                                    i++;
-                                    fseek(f,stripof[i],SEEK_SET);
-                                    if (size[0] == 1) {
-                                        if ((rout = fread(buffer,sizeof(unsigned short), stripro * size[1],f)) != stripro * size[1]) return false;
-                                    }else{// TODO!
+                        unsigned short* buffer = new unsigned short[stripro * size[1]];
+                        if (ite.first()) do{
+                            if (k >= stripro * size[1]* size[0]){
+                                i++;
+                                fseek(f,stripof[i],SEEK_SET);
+                                if (size[0] == 1) {
+                                    if ((rout = fread(buffer,sizeof(unsigned short), stripro * size[1],f)) != stripro * size[1]) return false;
+                                }else{// TODO!
 
-                                    }
-                                    k=0;
                                 }
-                                f_out.data[j++] = (C) buffer[k++];
-                            } while(ite.next());
-                            delete[](buffer);
-                        } //:
-                    }else if (unitsize == sizeof(unsigned int)*8){
-                        { //:
-                            //printf("RecognizedQ unsigned int!\n");
-                            unsigned int* buffer = new unsigned int[stripro * size[1]];
+                                k=0;
+                            }
+                            f_out.data[j++] = (C) buffer[k++];
+                        } while(ite.next());
+                        delete[](buffer);
+                    } //:
+                }else if (unitsize == sizeof(unsigned int)*8){
+                    { //:
+                        //printf("RecognizedQ unsigned int!\n");
+                        unsigned int* buffer = new unsigned int[stripro * size[1]];
 
-                            if (ite.first()) do{
+                        if (ite.first()) do{
 
-                                if (k >= stripro * size[1]* size[0]){
-                                    i++;
-                                    fseek(f,stripof[i],SEEK_SET);
-                                    if (size[0] == 1) {
-                                        if ((rout = fread(buffer,sizeof(unsigned int), stripro * size[1],f)) != stripro * size[1]) return false;
-                                    }else{ // TODO!
-                                    }
-                                    k=0;
+                            if (k >= stripro * size[1]* size[0]){
+                                i++;
+                                fseek(f,stripof[i],SEEK_SET);
+                                if (size[0] == 1) {
+                                    if ((rout = fread(buffer,sizeof(unsigned int), stripro * size[1],f)) != stripro * size[1]) return false;
+                                }else{ // TODO!
                                 }
-                                f_out.data[j++] = (C) buffer[k++];
-                            } while(ite.next());
-                            delete[](buffer);
+                                k=0;
+                            }
+                            f_out.data[j++] = (C) buffer[k++];
+                        } while(ite.next());
+                        delete[](buffer);
 
-                        } //:
-                    }else if (unitsize == 64){
-                    }
-                    break;
-                case 2: // signed int
-                    break;
-                case 3: // float
-                    if (unitsize == sizeof(float)*8){
-                        { //:
-                            //printf("RecognizedQ float!\n");
-                            float* buffer = new float[stripro * size[1]];
+                    } //:
+                }else if (unitsize == 64){
+                }
+                break;
+            case 2: // signed int
+                break;
+            case 3: // float
+                if (unitsize == sizeof(float)*8){
+                    { //:
+                        //printf("RecognizedQ float!\n");
+                        float* buffer = new float[stripro * size[1]];
 
-                            if (ite.first()) do{
-                                if (k >= stripro * size[1]* size[0]){
-                                    i++;
-                                    //	printf("%i!!!%i!!!%i\n",stripro, size[2] ,stripco.getSize());
-                                    fseek(f,stripof[i],SEEK_SET);
-                                    if (size[0] == 1) {
-                                        rout = fread(buffer,sizeof(float), stripro * size[1],f);
-                                    }else{
+                        if (ite.first()) do{
+                            if (k >= stripro * size[1]* size[0]){
+                                i++;
+                                //	printf("%i!!!%i!!!%i\n",stripro, size[2] ,stripco.getSize());
+                                fseek(f,stripof[i],SEEK_SET);
+                                if (size[0] == 1) {
+                                    rout = fread(buffer,sizeof(float), stripro * size[1],f);
+                                }else{
 
-                                    }
-                                    k=0;
                                 }
-                                f_out.data[j++] = (C) buffer[k++];
-                            } while(ite.next());
-                            delete[](buffer);
+                                k=0;
+                            }
+                            f_out.data[j++] = (C) buffer[k++];
+                        } while(ite.next());
+                        delete[](buffer);
 
-                        } //:
-                    }else if (unitsize == sizeof(double)*8){
-                        { //:
-                            //printf("RecognizedQ double!\n");
-                            double* buffer = new double[stripro * size[1]];
+                    } //:
+                }else if (unitsize == sizeof(double)*8){
+                    { //:
+                        //printf("RecognizedQ double!\n");
+                        double* buffer = new double[stripro * size[1]];
 
-                            if (ite.first()) do{
-                                if (k >= stripro * size[1]){
-                                    i++;
-                                    fseek(f,stripof[i],SEEK_SET);
-                                    if (size[0] == 1) rout = fread(buffer,sizeof(double), stripro * size[1],f);
-                                    else{
-                                    }
-                                    k=0;
+                        if (ite.first()) do{
+                            if (k >= stripro * size[1]){
+                                i++;
+                                fseek(f,stripof[i],SEEK_SET);
+                                if (size[0] == 1) rout = fread(buffer,sizeof(double), stripro * size[1],f);
+                                else{
                                 }
-                                f_out.data[j++] = (C) buffer[k++];
-                            } while(ite.next());
-                            delete[](buffer);
-                        } //:
-                    }
-                    break;
-            }
-        }else return false;
-		return(true);
-	}
+                                k=0;
+                            }
+                            f_out.data[j++] = (C) buffer[k++];
+                        } while(ite.next());
+                        delete[](buffer);
+                    } //:
+                }
+                break;
+        }
+    }else return false;
+    return(true);
+}
 
 	template <class C>
 	bool TiffFile::fetch_grayscale(DataGrid<C,2>& f_out){

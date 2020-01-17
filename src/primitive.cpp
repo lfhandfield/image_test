@@ -2194,88 +2194,89 @@ int ArgumentParser::operator()(int nbargs, char * const * args, bool has_prog_na
 		return true;
 	}
 
-TiffFile::TiffFile(const char* path, char mode) : curfp_pos(4), endfile_pos(0){
-    if (path != NULL){
-        switch(mode){
-        case 'r':
-            f =  fopen(path,"rb");
-            if (f == NULL) fprintf(stderr,"could not open file %s!\n", path);
-        break; case 'w': f = NULL;
-        break; default: f = fopen(path,"rb+"); // if no file is found, it will be created.
-        }
-        char buffer[256];
+	TiffFile::TiffFile(const char* path, bool writeonly) : curfp_pos(4), endfile_pos(0){
+		if (path != NULL){
+			f = (writeonly) ? NULL : fopen(path,"rb+");
+	char buffer[256];
 
-        if (f == NULL){ // it's a new file, init header!
-            f = fopen(path,"wb+");
-            if (f ==NULL) {fprintf(stderr,"could not open/create %s!\n", path); return;}
-            buffer[0] = 'I';
-            buffer[1] = 'I';
-            *(short*)(buffer + 2) = 42;
-            *(short*)(buffer + 2) = 42;
-            *(int*)(buffer + 4) = 0;
-            fwrite(buffer,sizeof(char),8,f);
+	if (f == NULL){ // it's a new file, init header!
+		f = fopen(path,"wb+");
+		if (f ==NULL) {fprintf(stderr,"could not open/create %s!\n", path); return;}
+		buffer[0] = 'I';
+		buffer[1] = 'I';
+		*(short*)(buffer + 2) = 42;
+		*(short*)(buffer + 2) = 42;
+		*(int*)(buffer + 4) = 0;
+		fwrite(buffer,sizeof(char),8,f);
 
-        }else{ // filed exists!
-            fread(buffer,sizeof(char),4,f);
-            if (buffer[0] == 'M'){
-                if (buffer[1] != 'M') {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
-                inv =true;
-                if (*((short*)(buffer + 2)) != 10752) {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
-                } else if (buffer[0]  == 'I'){
-                if (buffer[1] != 'I') {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
-                inv=false;
-            if (*((short*)(buffer + 2)) != 42) {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
-            }else fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path);
+	}else{ // filed exists!
+		fread(buffer,sizeof(char),4,f);
+		if (buffer[0] == 'M'){
+			if (buffer[1] != 'M') {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
+			inv =true;
+			if (*((short*)(buffer + 2)) != 10752) {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
+			} else if (buffer[0]  == 'I'){
+			if (buffer[1] != 'I') {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
+			inv=false;
+		if (*((short*)(buffer + 2)) != 42) {fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path); exit(1);}
+		}else fprintf(stderr,"tried to open %s, with is not a tiff file!\n", path);
 
-        }
-    } else f = NULL;
-}	
-TiffFile::~TiffFile(){if (f != NULL) fclose(f);}
+	}
+	} else f = NULL;
+}
+
+TiffFile::~TiffFile(){
+	if (f != NULL) fclose(f);
+}
+
 bool TiffFile::gotoNext(){
-	uint32_t i;
-	uint16_t s;
-	if (fseek(f, curfp_pos, SEEK_SET) != 0) return false;
-	if (fread(&i,sizeof(uint32_t),1,f) != 1) return false;
+	unsigned int i;
+	unsigned short s;
+	fseek(f, curfp_pos, SEEK_SET);
+	fread(&i,sizeof(unsigned int),1,f);
 	if (inv) ExOp::bytereverse(i);
 	if (i == 0) {fseek(f, -4 * sizeof(char), SEEK_CUR); return(false);}
 	fseek(f, i, SEEK_SET);
-	if (fread(&s,sizeof(uint16_t),1,f)  != 1) return false;
+	fread(&s,sizeof(unsigned short),1,f);
 	if (inv) ExOp::bytereverse(s);
 	curflaglist.setSize(s*12);
 	fread(&(curflaglist[0]),sizeof(unsigned char),s*12,f);
 	curfp_pos = i + (2+s*12)*sizeof(unsigned char);
-return(true);}
+	return(true);
+}
+
 int TiffFile::flagType(int flagindex){
-	unsigned short type = (*(unsigned short*)&(curflaglist[flagindex*12+2]));
-	if (inv) ExOp::bytereverse(type);
-	int out;
-	switch(type){
-		case 1:
-		case 2:
-		case 6:
-		case 7:
-			out = (*(unsigned int*)&(curflaglist[flagindex*12+4]));
-			if (inv) ExOp::bytereverse(out);
-			if (out <= 4) out =  type | 0x00000100;
-			else out = type;
-		break;
-		case 3:
-		case 8:
-			out = (*(unsigned int*)&(curflaglist[flagindex*12+4]));
-			if (inv) ExOp::bytereverse(out);
-			if (out <= 2) out =  type | 0x00000100;
-			else out = type;
-		break;
-		case 4: // int
-		case 9:
-		case 11:
-			out = (*(unsigned int*)&(curflaglist[flagindex*12+4]));
-			if (inv) ExOp::bytereverse(out);
-			if (out == 1) out =  type | 0x00000100;
-			else out = type;
-		break;
+		unsigned short type = (*(unsigned short*)&(curflaglist[flagindex*12+2]));
+		if (inv) ExOp::bytereverse(type);
+		int out;
+		switch(type){
+			case 1:
+			case 2:
+			case 6:
+			case 7:
+				out = (*(unsigned int*)&(curflaglist[flagindex*12+4]));
+				if (inv) ExOp::bytereverse(out);
+				if (out <= 4) out =  type | 0x00000100;
+				else out = type;
+			break;
+			case 3:
+			case 8:
+				out = (*(unsigned int*)&(curflaglist[flagindex*12+4]));
+				if (inv) ExOp::bytereverse(out);
+				if (out <= 2) out =  type | 0x00000100;
+				else out = type;
+			break;
+			case 4: // int
+			case 9:
+			case 11:
+				out = (*(unsigned int*)&(curflaglist[flagindex*12+4]));
+				if (inv) ExOp::bytereverse(out);
+				if (out == 1) out =  type | 0x00000100;
+				else out = type;
+			break;
+		}
+	return(out);
 	}
-return(out);}
 
 template< >
 int TiffFile::getValue<int>(int flagindex){
@@ -3659,7 +3660,7 @@ double CurvatureSearchScope::updateAscentVerbose(const double &value, double * g
     }
     if (debug) printf("value: %e,\tR. step bound %e\n", value, modif);
 return(modif);}
-// use BroydenÂ–FletcherÂ–GoldfarbÂ–Shanno algorithm
+// use Broyden–Fletcher–Goldfarb–Shanno algorithm
 /*
 double CurvatureSearchScope::updateAscentMK2(const double &value, double * guess,  double const * const deriv,  double const * const dbl_deriv){// returns a safe bound on the parameter changes;
     unsigned int i,j,k;
