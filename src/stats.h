@@ -282,7 +282,6 @@ public:
     void exportTiff(const char* folderpath)const;
     void exportZscore(const char* folderpath, const SparseMatrix<uint32_t> &input)const;
 
-
     class normalizeMK2_task;
     SparseMatrix<double> normalizeMK2(const SparseMatrix<uint32_t> &input)const;
     SparseMatrix<double> normalize(const SparseMatrix<uint32_t> &input, bool renormalize_pvalue_cdf=true, SparseMatrix<double>* opt_pvalout= NULL)const;
@@ -363,8 +362,6 @@ public:
 		void operator()(double * & _out, C& _in )const;
 		void operator()(double * _out, C& _in )const;
 
-
-
 		void push_back(ProbabilityDistribution<C>*  newdist);
 		ProbabilityDistribution<C>* pop_back();
 
@@ -376,7 +373,6 @@ public:
 		void setUnknownDensity(double);
 		void setSequential(bool on_off = true);
 		void setPrior(double* npr);
-
 		void EMinit();
 		void EMAlphainit(double);
 
@@ -396,12 +392,9 @@ public:
 		void EMclear();
 		double EMfinit();
 
-
-
 		double performEM(Vector<C> &list, int nbstep, bool rand_init = true);
 
 		// dimensionnal HMM!:
-
 
 		template<int dims> void ExpectHidden(DataGrid< double, dims+1> &prob, const DataGrid< C, dims> &data,  bool include_unknown) const;
 		// returns (P(Z | Data, param))
@@ -419,32 +412,32 @@ public:
 
 template<class C, unsigned int SIZE>
 	class GaussianObj : public ProbabilityDistribution< Tuple<C,SIZE> > {
-	public:
-        Tuple<C, SIZE> mean;
-        Trianglix<C, SIZE> ihvar;
-        double factor;
+public:
+    Tuple<C, SIZE> mean;
+    Trianglix<C, SIZE> ihvar;
+    double factor;
 
-		GaussElem<C,SIZE> scope;
+    GaussElem<C,SIZE> scope;
 
 
-        GaussianObj(){}
-        ~GaussianObj(){EMclear();}
+    GaussianObj(){}
+    ~GaussianObj(){EMclear();}
 
-        typename ExCo<C>::LMUL_TYPE computeProj(const Tuple<C,SIZE> &) const;
-        void operator()(double &, Tuple<C,SIZE> &) const;
+    typename ExCo<C>::LMUL_TYPE computeProj(const Tuple<C,SIZE> &) const;
+    void operator()(double &, Tuple<C,SIZE> &) const;
 
-		void EMinit();
-		void EMAlphainit(double);
+    void EMinit();
+    void EMAlphainit(double);
 
-		void EMregist(const Tuple<C,SIZE> &instance, const double prob= 1.0f);
-		GaussianObj<C,SIZE>* EMnext(double alpha) const;
-        double LL(const C&) const;
+    void EMregist(const Tuple<C,SIZE> &instance, const double prob= 1.0f);
+    GaussianObj<C,SIZE>* EMnext(double alpha) const;
+    double LL(const C&) const;
 
-		double EMfinit();
-		void EMclear();
-		void show(FILE *f, unsigned int level = 0 )const;
+    double EMfinit();
+    void EMclear();
+    void show(FILE *f, unsigned int level = 0 )const;
 
-	};
+};
 
 // observations 7 ~ NB(
 
