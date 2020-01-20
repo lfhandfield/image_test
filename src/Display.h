@@ -63,8 +63,8 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 #else
-#include <SDL2/SDL>
-#include <SDL2/SDL_mixer>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #endif
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
