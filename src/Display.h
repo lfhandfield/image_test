@@ -59,13 +59,12 @@
 #else${COMPILER_LIB}
 */
 
-#ifdef Rcpp_hpp
-#include "SDL2/SDL.h"
-#else
-// #include "SDL2/SDL.h"
+#ifdef __WIN32__
 #include "SDL.h"
-#include "SDL_net.h"
 #include "SDL_mixer.h"
+#else
+#include <SDL2/SDL>
+#include <SDL2/SDL_mixer>
 #endif
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -558,9 +557,7 @@ class Controlstate{
     static void check_openGL();
     static bool init_SDL(const char* const name, const char* const prod);
     static void clean_openGL();
-#ifdef _SDL_NET_H
-    static bool init_SDL_NET();
-#endif
+
 
 #ifdef _SDL_MIXER_H
     static void clean_SDL_mixer();
@@ -1478,11 +1475,6 @@ class GUICumulus : public GUIObject{
 };
 
 }; // namespace end
-
-#ifdef _SDL_NET_H
-  #include "./NetEvents.h"
-#endif
-
 
 #include "Display.hpp"
 

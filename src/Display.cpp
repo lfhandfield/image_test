@@ -171,21 +171,6 @@ char* Controlstate::usePrefPath(const char* const filename){
     return def_path;
 }
 
-
-#ifdef _SDL_NET_H
-
-bool Controlstate::init_SDL_NET(){
-    int return_happy_valgrind=0;
-    if ((return_happy_valgrind =SDLNet_Init()) != 0) {
-        std::cerr << "SDLNet_Init: " << SDLNet_GetError() << std::endl;
-        return false;
-        }
-    atexit(SDLNet_Quit);
-    return true;
-}
-
-#endif
-
 void Controlstate::clean_openGL(){
 }
 

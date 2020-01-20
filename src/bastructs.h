@@ -2959,7 +2959,7 @@ public:
     ThreadBase& toSize(uint32_t s){this->toMemfree(); nbthreads = s; thrds = new std::thread*[nbthreads]; return *this;}
     void setSize(uint32_t s){this->toSize(s);}
 
-    ERRCODE startThread(uint32_t thdID, std::function<int (uint32_t)> fnc);
+    uint32_t startThread(uint32_t thr_input, std::function<int (uint32_t)> fnc); // return thread Alias, 0 if fail
 
 
     void startThreadArray(uint32_t nbthreads = std::thread::hardware_concurrency());

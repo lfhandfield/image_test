@@ -200,10 +200,13 @@ void ThreadBase::joinAll(){
         }
     }*/
 }
-ERRCODE ThreadBase::startThread(uint32_t thrID, std::function< int(uint32_t) > fnc){
-    if (dedicated.find(thrID) != 0xFFFFFFFF) return 1;
-    dedicated[thrID] = new std::thread(std::bind(fnc, thrID));
-return 0;}
+uint32_t ThreadBase::startThread(uint32_t thr_input, std::function< int(uint32_t) > fnc){
+    uint32_t r;
+    do{
+        ExOp::toRand(r);
+    }while((r == 0)||(dedicated.find(r) != 0xFFFFFFFF));
+    dedicated[r] = new std::thread(std::bind(fnc, thr_input));
+return r;}
 void ThreadBase::joinThread(uint32_t thrID){
     if (dedicated.find(thrID) == 0xFFFFFFFF){
         this->printf("warning! trying to join an un-existing thread\n");

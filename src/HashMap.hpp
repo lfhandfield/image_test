@@ -3024,13 +3024,10 @@ LFHTEMP void myHashmap<Key,void,HashFunc>::show(FILE*f, int level)const{
 
 LFHTEMP unsigned int myHashmap<K,Anything,H>::hashpos(unsigned int seed) const{
 return (seed & ((0xFFFFFFFF << hash_mag)^ 0xFFFFFFFF));}
-
 LFHTEMP void myHashmap<K,Anything,H>::swap_and_pop(unsigned int ite){  // moves entry in vector, into an unlinked location
 }
-
 LFHTEMP uint32_t myHashmap<K,Anything,H>::find(const K &) const{
 return 0xFFFFFFFF;}
-
 LFHTEMP myHashmap<K,Anything,H>& myHashmap<K,Anything,H>::toMemmove(myHashmap<K,Anything,H>& other){
     if (hash_mag != 0) delete[](hash);
     heap.toMemmove(other.heap);
