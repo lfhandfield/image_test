@@ -204,7 +204,13 @@ ERRCODE ThreadBase::startThread(uint32_t thrID, std::function< int(uint32_t) > f
     if (dedicated.find(thrID) != 0xFFFFFFFF) return 1;
     dedicated[thrID] = new std::thread(std::bind(fnc, thrID));
 return 0;}
-void ThreadBase::joinThread(uint32_t thrID){dedicated[thrID]->join(); delete(dedicated[thrID]); dedicated.erase(thrID);}
+void ThreadBase::joinThread(uint32_t thrID){
+    if (dedicated.find(thrID) == 0xFFFFFFFF){
+        this->printf("warning! trying to join an un-existing thread\n");
+    }else{
+        dedicated[thrID]->join(); delete(dedicated[thrID]); dedicated.erase(thrID);
+    }
+}
 void ThreadBase::startThreadArray(uint32_t _nbthreads){
     running = true;
     nbactivethr =0;

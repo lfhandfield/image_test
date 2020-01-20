@@ -147,7 +147,7 @@ public:
     // build missing operations from primitives!
 
     // builds
-    static A& toMemmove(A& a, A &b){return a = b;} // unknown, copy
+    static A& toMemmove(A& a, A &b){return a = std::move(b);} // unknown, copy
     static A& toMemfree(A& a){return a;} // unknown, ignore
     inline static A mkAbs(const A& a);
     inline static A mknegative(const A& a);

@@ -104,26 +104,6 @@ template<class F, class I> I monotonicSolver(const F& f, const I &minimum, const
 #undef LFHTEMP
 #define LFHTEMP template <class C,unsigned int TSIZE,Tuple_flag Cflag> template <class O>
 
-LFHTEMP auto Tuple<C,TSIZE,Cflag>::operator+(Tuple<O,TSIZE,Cflag> const & other) const
- -> Tuple< decltype( ExOp::mkAdd((*this)[0u], other[0u])),TSIZE,Cflag>{
-    Tuple< decltype( ExOp::mkAdd((*this)[0u], other[0u])),TSIZE,Cflag> f_out;
-    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkAdd((*this)[i],other[i]);
-return( f_out );}
-LFHTEMP auto Tuple<C,TSIZE,Cflag>::operator-(Tuple<O,TSIZE,Cflag> const & other) const
- -> Tuple< decltype( ExOp::mkSubt((*this)[0u], other[0u])),TSIZE,Cflag>{
-    Tuple< decltype( ExOp::mkSubt((*this)[0u], other[0u])),TSIZE,Cflag> f_out;
-    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkSubt((*this)[i], other[i]);
-return( f_out );}
-LFHTEMP auto Tuple<C,TSIZE,Cflag>::operator*(Tuple<O,TSIZE,Cflag> const & other) const
- -> Tuple< decltype( ExOp::mkMult((*this)[0u], other[0u])),TSIZE,Cflag>{
-    Tuple< decltype( ExOp::mkMult((*this)[0u], other[0u])),TSIZE,Cflag> f_out;
-    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkMult((*this)[i], other[i]);
-return( f_out );}
-LFHTEMP auto Tuple<C,TSIZE,Cflag>::operator/(Tuple<O,TSIZE,Cflag> const & other) const
- -> Tuple< decltype( ExOp::mkDivi((*this)[0u], other[0u])),TSIZE,Cflag>{
-    Tuple< decltype( ExOp::mkDivi((*this)[0u], other[0u])),TSIZE,Cflag> f_out;
-    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkDivi((*this)[i], other[i]);
-return( f_out );}
 
 LFHTEMP Tuple<typename STDRETTYPE2<C,O>::PLUS_TYPE ,TSIZE,Cflag>
 	Tuple<C,TSIZE,Cflag>::operator+(O const & other) const{
@@ -7066,7 +7046,7 @@ public:
 
 
         thrbase.finishProgress(thrID);
-    }
+    return 0;}
 };
 
 template<class C> Tuple<uint32_t> MPReachDistribution::learnPermutation(const SparseMatrix<C>& data, double prior_count, double &LL_to_change){ // return permutation of data

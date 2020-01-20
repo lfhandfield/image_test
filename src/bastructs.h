@@ -700,7 +700,6 @@ public:
 	LFHTEMP Tuple<C,TSIZE,Cflag>& operator*=(Tuple<O,TSIZE,Cflag> const & other);
 	LFHTEMP Tuple<C,TSIZE,Cflag>& operator/=(Tuple<O,TSIZE,Cflag> const & other);
 
-
 	LFHTEMP auto operator+(Tuple<O,TSIZE,Cflag> const & other) const -> Tuple< decltype( ExOp::mkAdd((*this)[0], other[0]) ),TSIZE,Cflag>;
 	LFHTEMP auto operator-(Tuple<O,TSIZE,Cflag> const & other) const -> Tuple< decltype( ExOp::mkSubt((*this)[0], other[0]) ),TSIZE,Cflag>;
 	LFHTEMP auto operator*(Tuple<O,TSIZE,Cflag> const & other) const -> Tuple< decltype( ExOp::mkMult((*this)[0], other[0]) ),TSIZE,Cflag>;
@@ -1343,8 +1342,8 @@ public:
 //    LFHPrimitive::Iterator<uint32_t, Tuple<const C, 0u, TUPLE_FLAG_REMOTE_MEMORY> > getColumnPartitionPolyIterator(uint32_t i, uint32_t nb)const{return (LFHPrimitive::Iterator<uint32_t, Tuple<const C, 0u, TUPLE_FLAG_REMOTE_MEMORY> >)this->getColumnParititionIterator(i,nb);}
 
 
-    explicit operator Accessor<uint32_t, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY> > (){using std::placeholders::_1; using std::placeholders::_2;  return LFHPrimitive::Accessor<uint32_t, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY> >(std::bind( &accessCol, this, _1,_2));}
-    bool accessCol(const uint32_t& col, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY>*& target){}
+    //explicit operator Accessor<uint32_t, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY> > (){using std::placeholders::_1; using std::placeholders::_2;  return LFHPrimitive::Accessor<uint32_t, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY> >(std::bind( &accessCol, this, _1,_2));}
+    //bool accessCol(const uint32_t& col, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY>*& target){}
 
     explicit operator IteratorMaker<uint32_t, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY> > (){using std::placeholders::_1; using std::placeholders::_2; return IteratorMaker<uint32_t, Tuple<C, 0u, TUPLE_FLAG_REMOTE_MEMORY> >(std::bind( &getColumnPartitionPolyIterator, this, _1,_2));}
 
@@ -1948,7 +1947,7 @@ public:
 	Vector(): asize(0){}
 	Vector(const Vector<Anything> & v):anytype(v.anytype) {setSize_init(v.getSize()); memcpy(darray,v.darray, v.getSize() * (v.anytype & 0xFF));}
 	Vector(Vector<Anything>&& v):asize(v.asize),darray(v.darray),anytype(v.anytype){v.asize =0;}
-	Vector<Anything>& operator=(const Vector<Anything> & v){if (asize != 0) delete[](darray); anytype = v.anytype; setSize_init(v.getSize()); memcpy(darray,v.darray, v.getSize() * (v.anytype & 0xFF));}
+	Vector<Anything>& operator=(const Vector<Anything> & v){if (asize != 0) delete[](darray); anytype = v.anytype; setSize_init(v.getSize()); memcpy(darray,v.darray, v.getSize() * (v.anytype & 0xFF)); return *this;}
 	Vector<Anything>& operator=(Vector<Anything>&& v){this->toMemfree(); asize = v.asize; anytype = v.anytype; darray = v.darray; v.asize=0; return *this;}
 	~Vector(){if (asize != 0) delete[](darray);}
 
@@ -2453,7 +2452,12 @@ public:
         void unlock(); // preemptively unlock target prior to destruction
 
         operator bool()const {return exitcode != 0;}
-        const C* operator->(){return elem;}
+        const C* operator->(){
+            if (elem == NULL){
+                printf("booo!\n");
+            }
+            return elem;
+        }
         C operator*(){return *elem;}
         void remove(); // this bypass "const", use with care
     };
@@ -3583,7 +3587,7 @@ class Trianglix<C, 0u>{ // square, symetric matrix (anti-symmetric in imaginary)
 	C& cell(unsigned int x, unsigned int y){return data[ (x>= y) ? y + ((x * (x+1)) >>1) : x + ((y * (y+1)) >>1)];}
 	C cell(unsigned int x, unsigned int y) const {return data[ (x>= y) ? y + ((x * (x+1)) >>1) : x + ((y * (y+1)) >>1)];}
 
-    void eigen() const;
+
 
 	ERRCODE save(FILE* f)const{ERRCODE fout = (fwrite(&t_size, sizeof(unsigned int), 1,f) == 1) ? 0 : 1; return fout | (fwrite(data,sizeof(C),totsize(),f) == totsize()) ? 0 : 1;}
 	ERRCODE load(FILE* f,unsigned int lenght =0) {unsigned int i; if (fread(&i, sizeof(unsigned int), 1,f) != 1) return 1; this->setSize(i); return (fread(data,sizeof(C),totsize(),f) == totsize())? 0 : 1;}

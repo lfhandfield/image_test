@@ -222,6 +222,26 @@ return(i == TSIZE);
 }
 
 
+LFHTEMP template<class O> auto Tuple<C,TSIZE,Cflag>::operator+(Tuple<O,TSIZE,Cflag> const & other) const
+ -> Tuple< decltype( ExOp::mkAdd((*this)[0], other[0])),TSIZE,Cflag>{
+    Tuple< decltype( ExOp::mkAdd((*this)[0], other[0])),TSIZE,Cflag> f_out;
+    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkAdd((*this)[i],other[i]);
+return( f_out );}
+LFHTEMP template<class O> auto Tuple<C,TSIZE,Cflag>::operator-(Tuple<O,TSIZE,Cflag> const & other) const
+ -> Tuple< decltype( ExOp::mkSubt((*this)[0], other[0])),TSIZE,Cflag>{
+    Tuple< decltype( ExOp::mkSubt((*this)[0], other[0])),TSIZE,Cflag> f_out;
+    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkSubt((*this)[i], other[i]);
+return( f_out );}
+LFHTEMP template<class O> auto Tuple<C,TSIZE,Cflag>::operator*(Tuple<O,TSIZE,Cflag> const & other) const
+ -> Tuple< decltype( ExOp::mkMult((*this)[0], other[0])),TSIZE,Cflag>{
+    Tuple< decltype( ExOp::mkMult((*this)[0], other[0])),TSIZE,Cflag> f_out;
+    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkMult((*this)[i], other[i]);
+return( f_out );}
+LFHTEMP template<class O> auto Tuple<C,TSIZE,Cflag>::operator/(Tuple<O,TSIZE,Cflag> const & other) const
+ -> Tuple< decltype( ExOp::mkDivi((*this)[0], other[0])),TSIZE,Cflag>{
+    Tuple< decltype( ExOp::mkDivi((*this)[0], other[0])),TSIZE,Cflag> f_out;
+    for(unsigned int i=0;i<TSIZE;i++) f_out[i] = ExOp::mkDivi((*this)[i], other[i]);
+return( f_out );}
 LFHTEMP void Tuple<C,TSIZE,Cflag>::show( FILE *f_out, int l) const{
 	switch(l){
 		case 1:
@@ -2885,9 +2905,7 @@ LFHTEMP Tuple<double> SparseMatrix<C>::UTestSamplingPvalue(const Tuple<double> &
 
 
     }
-}
-
-
+return fout;}
 LFHTEMP TMatrix<Zscore>  SparseMatrix<C>::UTestZScoreSplit(const Tuple< Tuple<uint32_t> > &lists, const Tuple<uint32_t> &ordering, uint32_t nbthreads, uint32_t splitgroups, const Tuple<uint32_t> &partit, TMatrix<double> *opt_logit_auroc,TMatrix<double> *opt_mean, TMatrix<double> *opt_drop_enrich,  bool print_prog, bool hypergeo_correction, bool downsample)const{ // compute rank test for each column for specific rows only statistics , Zscore and optionnaly logit Auroc reported
     TMatrix<Tuple<uint32_t> > splitlists;
     Tuple<uint32_t, 2u> coor;
@@ -7096,7 +7114,7 @@ LFHTEMP C Trianglix<C, 0u>::Xformed_inner_product_of_inverse(const Tuple<C, 0u> 
 
     return(fout);
     }
-LFHTEMP void Trianglix<C, 0u>::eigen() const{
+/*LFHTEMP void Trianglix<C, 0u>::eigen() const{
     Trianglix<C, 0u> fout(*this);
     if (getSize() >2){
     C* buf = new C[getSize()]; LFH_NICE_ALLOCERROR(buf,"")
@@ -7136,7 +7154,7 @@ LFHTEMP void Trianglix<C, 0u>::eigen() const{
         fout.data[2] = data[0] * denum;
     }  else if (getSize() == 1) fout.data[0] = ExOp::mkInverse(data[0]);
     return(fout);
-}
+}*/
 LFHTEMP void Trianglix<C, 0u>::show(FILE* f, int level)const{
     unsigned int i,ts,k,j;
     for(i=0,ts=totsize(),j=0,k=2;i<ts;i++) {ExOp::show(data[i],f,level+1); if (i==j) {fprintf(f,"\n"); j+= k++;} else fprintf(f,"\t");}

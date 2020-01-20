@@ -1119,7 +1119,6 @@ class ExFn{// ExFn<true>
 template< >
 class ExFn<false>{
 public:
-
 	template<class A> inline static bool isZero(const A& what) {return ExCo<A>::isZero(what);}
 	template<class A> inline static bool isOne(const A& what) {return ExCo<A>::isOne(what);}
 	template<class A> inline static A& toZero(A& what) {return ExCo<A>::toZero(what);}

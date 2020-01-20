@@ -34,18 +34,12 @@
 //#define GLFW_DLL
 //#include <GLFW/glfw3.h>
 
-//#include "./glad.h"
+#include "./glad.h"
 
-// OpenGL / glew Headers
-#define GL3_PROTOTYPES 1
-#include <GL/glew.h>
 
-// SDL2 Headers
-#include <SDL2/SDL.h>
-
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-//#include <GL/glext.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
 
 #define SHADER_STRINGIFY(V,A) "#version " #V "\n" #A
 //#define AL_AL_H
@@ -65,14 +59,14 @@
 #else${COMPILER_LIB}
 */
 
-//#ifdef Rcpp_hpp
-//#include "SDL2/SDL.h"
-//#else
+#ifdef Rcpp_hpp
+#include "SDL2/SDL.h"
+#else
 // #include "SDL2/SDL.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
-//#include "SDL_mixer.h"
-//#endif
+#include "SDL.h"
+#include "SDL_net.h"
+#include "SDL_mixer.h"
+#endif
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -168,6 +162,8 @@ context, filepath="./fun.obj",
          True
 
 */
+
+// bake, select high then low res
 
 
 // server vs emulator
@@ -528,13 +524,6 @@ public:
 
 };
 
-class Latent : public Event< >{
-public:
-    EventQueue<void > queue; // processes that can wait, and may take much time
-    unsigned int state;
-    unsigned int internal_state;
-    virtual unsigned int operator()();
-    };
 enum INPUTSTATE_enum{
 	INPUTSTATE_PRESSED_SHIFT=0,
 	INPUTSTATE_PRESSED_MOUSELEFT=1,
@@ -590,8 +579,6 @@ class Controlstate{
 
     bool alias_storm;
 
-    void create_latent_thread();
-
     void main_control_loop(RessourceLoader* res_loader);
 
     //uint32_t max_reserved_guialias;
@@ -644,15 +631,15 @@ class Controlstate{
     bool isLeftAltDown()const {return ((button_state & 64) != 0) ;}
 
 
-    LFHPrimitive::myHashmap<unsigned int, Event<GUImessage>*> gui_events;
-    LFHPrimitive::myHashmap<unsigned int, GUIHead> gui_objects_ptr;
-    LFHPrimitive::myHashmap<unsigned int, char> ThreadID_mask;
-    LFHPrimitive::myHashmap<unsigned int, GUIStyle> gui_styles;
+    LFHPrimitive::myHashmap<uint32_t, Event<GUImessage>*> gui_events;
+    LFHPrimitive::myHashmap<uint32_t, GUIHead> gui_objects_ptr;
+    LFHPrimitive::myHashmap<uint32_t, char> ThreadID_mask;
+    LFHPrimitive::myHashmap<uint32_t, GUIStyle> gui_styles;
 
     EventQueue<void > timequeue;
-    EventQueue<void > latentqueue; // processes ran by other thread
 
-    Latent passive; // processes that can wait, and may take much time...
+
+    //Latent passive; // processes that can wait, and may take much time...
 
     bool fetchMessage(GUImessage&);
 	bool query(INPUTSTATE_enum ) const;
@@ -853,16 +840,10 @@ class GUIArea : public GUIObject{
 
 	//void setForgroundSub(int alias);
     GUIMSG_Enum  processGUIevent(const GUIMSG_Enum event);
-
 	void drawSubs();
 	void drawAliasSubs(bool is_text);
-
-
-
 	void setAreaDimentions(unsigned int width, unsigned int height, bool is_equal_to_real);
-
     double getValue()const{return 0;}
-
     uint32_t getArrayIDfromMouse()const;
 };
 
@@ -954,8 +935,7 @@ class GUIScroll : public GUIObject{
 
     public:
     int32_t rect[4];
-    double  min;
-    double  max;
+    double  min, max;
     double  value;
     double  minstep; // or interval size
     uint32_t flags;
@@ -1500,7 +1480,7 @@ class GUICumulus : public GUIObject{
 }; // namespace end
 
 #ifdef _SDL_NET_H
-// #include "./NetEvents.h"
+  #include "./NetEvents.h"
 #endif
 
 

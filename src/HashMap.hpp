@@ -3023,13 +3023,13 @@ LFHTEMP void myHashmap<Key,void,HashFunc>::show(FILE*f, int level)const{
 #define LFHTEMP template<class K,class H>
 
 LFHTEMP unsigned int myHashmap<K,Anything,H>::hashpos(unsigned int seed) const{
-}
+return (seed & ((0xFFFFFFFF << hash_mag)^ 0xFFFFFFFF));}
 
 LFHTEMP void myHashmap<K,Anything,H>::swap_and_pop(unsigned int ite){  // moves entry in vector, into an unlinked location
 }
 
 LFHTEMP uint32_t myHashmap<K,Anything,H>::find(const K &) const{
-}
+return 0xFFFFFFFF;}
 
 LFHTEMP myHashmap<K,Anything,H>& myHashmap<K,Anything,H>::toMemmove(myHashmap<K,Anything,H>& other){
     if (hash_mag != 0) delete[](hash);
@@ -3049,15 +3049,15 @@ LFHTEMP myHashmap<K,Anything,H>& myHashmap<K,Anything,H>::toMemswap(myHashmap<K,
 return *this;}
 LFHTEMP myHashmap<K,Anything,H>& myHashmap<K,Anything,H>::operator=(const myHashmap<K,Anything,H>& other){
 }
-
-LFHTEMP AnythingConst myHashmap<K,Anything,H>::operator[](const K &) const{
-}
-LFHTEMP Anything myHashmap<K,Anything,H>::operator[](const K &){
-}
-
-LFHTEMP Anything myHashmap<K,Anything,H>::addEntry(const K &){
-}
-
+LFHTEMP AnythingConst myHashmap<K,Anything,H>::operator[](const K &key) const{
+    uint32_t ite = this->find(key);
+return data[ite];}
+LFHTEMP Anything myHashmap<K,Anything,H>::operator[](const K &key){
+    uint32_t ite = this->find(key);
+return data[ite];}
+LFHTEMP Anything myHashmap<K,Anything,H>::addEntry(const K &key){
+    data.push_back();
+return data[data.getSize()-1];}
 LFHTEMP void myHashmap<K,Anything,H>::erase(const K &){
 }
 LFHTEMP void myHashmap<K,Anything,H>::rmEntry(const K &){
@@ -4791,7 +4791,7 @@ LFHTEMP void AsyncHashmap<C,void,HF>::testThisDataStructure(uint32_t nbthreads, 
                 thrbase.printf("F[%i] = %i\n", ite(), ite->d);
             }while(ite++);
             thrbase.printf("\n%i %X\n", threadID, target.queryChunkIO());*/
-        }
+        return 0;}
 
         void iterMadness(){
             /*for(int i =0;i<10;i++){

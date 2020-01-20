@@ -90,21 +90,6 @@ InputState istate;
 Controlstate ctrl_state;
 
 
-
-unsigned int Latent::operator()(){
-    state =1;
-    while(state == 1) {
-        internal_state = state;
-        if (queue.getSync()){
-            while (queue.pop_exec());
-            queue.freeSync();
-        }
-        SDL_Delay(1024);
-        }
-    state = 1;
-    return 0;
-    }
-
 bool Controlstate::init_openGL(){
     /*if (!glfwInit()) {
         fprintf(stderr, "ERROR: could not start GLFW3\n");
@@ -122,9 +107,16 @@ bool Controlstate::init_openGL(){
 
     }*/
     #endif
-	
-	
     return true;
+}
+
+void Controlstate::check_openGL(){
+    const GLubyte* entry;
+    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
+    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
 }
 
 
@@ -170,9 +162,6 @@ bool Controlstate::init_SDL(const char* const name, const char* const prod){
         memcpy(ctrl_state.def_path, path, ctrl_state.def_path_start);
         SDL_free(path);
     }
-
-
-	
     atexit(SDL_Quit);
     return true;
 }
@@ -311,9 +300,7 @@ GLuint Controlstate::compileshader_routine(const char * const vcode, const char 
     return(fout);
 }
 GLuint Controlstate::compileshader_advroutine(const char * const vcode, const char * const  code, unsigned int flag, const char * const name){
-	if  (glCreateShader == NULL) {printf("glCreateShader is null!\n!!!!"); exit(1);}
-	
-GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
     GLuint davshade = glCreateShader(GL_VERTEX_SHADER);
     GLchar* tmp_code; unsigned int lenght;
     lenght= strlen(vcode)+1; tmp_code = new GLchar[lenght]; memcpy(tmp_code,vcode,lenght);
@@ -352,7 +339,6 @@ GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
     glAttachShader(fout, davshade);
 //	if (glGetError()) {printf("error for %s:",name);printInfoLog(fout);}
     glAttachShader(fout, dashade);
-	if  (glBindAttribLocation == NULL) {printf("glBindAttribLocation is null!\n!!!!"); exit(1);}
  //   if (glGetError()) {printf("error for %s:",name);printInfoLog(fout);}
     glBindAttribLocation(fout,ATTRIBUTE_POSITION, "glcVertex");//printInfoLog(fout);
     if (flag & 1){
@@ -396,6 +382,7 @@ GLuint dashade = glCreateShader(GL_FRAGMENT_SHADER);
 }
 
 void Controlstate::compiledefaultshaders(){
+
 
      ctrl_state.datext_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
@@ -455,10 +442,12 @@ void Controlstate::compiledefaultshaders(){
             gl_FragColor = (fract(tmp.x * channel) < 0.5f) ? bgcolor : ((fract(tmp.y * channel) < 0.5f) ? fcolor: bcolor);
             }
     ),5, "datext_shader");
+
     glUseProgram(datext_shader);
     glUniform1i(glGetUniformLocation(datext_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(datext_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(datext_shader, "tFontcoor"),1);
+
 ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
     in vec4 chr_id;
@@ -511,10 +500,12 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = (fract(tmp.x * channel) < 0.5f) ? bgcolor : ((fract(tmp.y * channel) < 0.5f) ? fcolor: bcolor);
             }
     ),5, "datext2_shader");
+
     glUseProgram(datext2_shader);
     glUniform1i(glGetUniformLocation(datext2_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(datext2_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(datext2_shader, "tFontcoor"),1);
+
 
 
 
@@ -563,10 +554,12 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = icolor;
             }
     ),5, "sstext_shader");
+
     glUseProgram(sstext_shader);
     glUniform1i(glGetUniformLocation(sstext_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(sstext_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(sstext_shader, "tFontcoor"),1);
+
 
     ctrl_state.sstext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIFY(130,
     in vec4 glcVertex;
@@ -611,11 +604,12 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
             gl_FragColor = icolor;
             }
     ),5, "sstext2_shader");
+
     glUseProgram(sstext2_shader);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tPalette"),2);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tFontdata"),0);
     glUniform1i(glGetUniformLocation(sstext2_shader, "tFontcoor"),1);
-   
+
 
 
 /*
@@ -757,7 +751,7 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
     glUniform1i(glGetUniformLocation(daframe_shader, "tBackground"),2);
     glUniform1i(glGetUniformLocation(daframe_shader, "tBorder"),0);
     glUniform1i(glGetUniformLocation(daframe_shader, "tPalette"),1);
-   
+
 
 //            lt.x = (gl_FragCoord.x < boundrect.x + 32* bordersize) ? 0.5 + 0.0078125 * (gl_FragCoord.x - boundrect.x) / bordersize : ((gl_FragCoord.x + 32* bordersize> boundrect.z) ? 1.0 - 0.0078125 * (boundrect.z - gl_FragCoord.x) / bordersize:  0.5 * fract(0.015625 * gl_FragCoord.x));
 
@@ -957,7 +951,7 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
     glUseProgram(daicon_alias_shader);
     glUniform1i(glGetUniformLocation(daicon_alias_shader, "tMotif"),0);
     glUniform1i(glGetUniformLocation(daicon_alias_shader, "tMask"),1);
-   
+
     ctrl_state.daheat_shader = ctrl_state.compileshader_routine( SHADER_STRINGIFY(130,
 //\#version 130
     uniform vec4 boundrect;
@@ -1000,12 +994,10 @@ ctrl_state.datext2_shader = ctrl_state.compileshader_advroutine( SHADER_STRINGIF
 			gl_FragColor = mix(vec4(palUV.y * 4,palUV.y * 4,palUV.y * 4,1.0f), texture(tPalette, palUV.xy), palUV.z);
             }
     ),"daheat_shader");
-   
+
     glUseProgram(daheat_shader);
     glUniform1i(glGetUniformLocation(daheat_shader, "tPalette"),0);
-   
-}
-void Controlstate::create_latent_thread(){
+
 }
 
 bool Controlstate::query(INPUTSTATE_enum what) const{
@@ -1026,10 +1018,7 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
 	tooltipalias = 0;
     stringCapture_cur = 0x1000;
     stringCapture_endptr = 0x1000;
-
     ctrl_state.compiledefaultshaders();
-
-	ctrl_state.create_latent_thread();
 	int i,gui_out;
 	ctrl_state.mouse_coor[0] =0;ctrl_state.mouse_coor[1] =0;
 
@@ -1053,7 +1042,7 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
 
     while(ctrl_state.states.size() != 0) {
         if (!thrbase.isRunning()) {
-            thrbase.stopThreads();
+            thrbase.joinThreads();
             ctrl_state.close_procstates(0);
             break;
         }
@@ -1311,7 +1300,6 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
             break;
         }
         case SDL_QUIT: // alt-f4!
-            passive.state = 0;
             close_procstates(0);
             return;
 
@@ -1407,13 +1395,7 @@ void Controlstate::main_control_loop(RessourceLoader* res_loader){
 */
          for(d = ctrl_state.states.size(); (d--) != 0 ;) ctrl_state.states[d]->OnMaintain();
 
-        latentqueue.pop_exec();
-        latentqueue.pop_exec();
-        latentqueue.pop_exec();
-        latentqueue.pop_exec();
-
     }
-    passive.state = 0;
     // exiting! delete elems in stack;
     close_procstates(0);
 }
@@ -2236,10 +2218,6 @@ void GUIStyle::drawTextMesh(const GuiTextAttribute &texta, const int32_t* obrect
     glVertexAttribPointer(ATTRIBURE_CHARID,4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(float)*3+sizeof(char) * 4 , BUFFER_OFFSET(sizeof(float)*3));
     glDrawArrays(GL_QUADS, 0, texta.glbuffer_indexes[1]);
     }
-	
-	
-
-
 /** \brief Render text
  *
  * \param shaderID
@@ -2296,15 +2274,7 @@ void GUIStyle::setToAreaDefault(){
 void GUIStyle::setToMenuDefault(){
 	setBorderSizes(64,64);
 }
-void Controlstate::check_openGL(){
-    const GLubyte* entry;
-    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
-}
-	
+
 	MyWindow::MyWindow(unsigned int alias, unsigned int style_alias, int sizex,int sizey, RELPOS_enum posis, bool full, int nCmdShow,const char* winname): GUIArea(alias,style_alias),isfullscr(full),last_mouse_depth(0.0){
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        8);
@@ -2370,32 +2340,12 @@ void Controlstate::check_openGL(){
     if ((glcontext = SDL_GL_CreateContext(Surf_Display)) == NULL) myexit(SDL_GetError(void));
 
     SDL_GL_SetSwapInterval(1);
-	SDL_GL_MakeCurrent(Surf_Display, glcontext);
-		
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	
-	//MUST make a context AND make it current BEFORE glewInit()!
-	glewExperimental = GL_TRUE;
-	GLenum glew_status = glewInit();
-	if (glew_status != 0) {fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status)); exit(1); }
-    const GLubyte* entry;
-    entry = glGetString(GL_VENDOR); printf("Vendor: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_RENDERER); printf("Renderer: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_VERSION); printf("OpenGL Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_SHADING_LANGUAGE_VERSION); printf("Shader Version: %s\n", (entry) ? (const char*) entry : "Unknown");
-    entry = glGetString(GL_EXTENSIONS); printf("Extensions: %s\n", (entry) ? (const char*) entry : "Unknown");
 
-		
-		
-		
-    /*if(!gladLoadGL()) {
+    if(!gladLoadGL()) {
         printf("Something went wrong!\n");
         exit(-1);
-    }*/
+    }
 
-
-	if (glClearColor == NULL) printf("function is still not linked...!!!\n");
   //  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   //  SDL_RenderClear(renderer);
   //  SDL_RenderPresent(renderer);
@@ -2447,7 +2397,6 @@ target? is the location where the framebuffer object is bound. To set the width,
             if (framebufferID[i] == 0) {printf("Could not allocate framebuffer no%i\n", i); ExOp::show(framebufferID); exit(1);}
         }
     }
-
 //    glGenTextures(1,&renderbufferID);
 
     last_mouse_ddepth[0] =0.0; // happy valgrind!
@@ -2574,6 +2523,8 @@ glDrawBuffer(GL_NONE);*/
 
 	glDepthFunc(GL_LEQUAL);glEnable(GL_CULL_FACE);
     for(i=0;i<render_list.size();i++) render_list[i]->drawPostGUI(this);
+
+
 
 //    if (wind_bit) wind_bit->draw(0,0);
      while(true){

@@ -5610,7 +5610,7 @@ LFHTEMP class BiClassifier<C,R,S>::normalizeMK2_task{
             }
         }
         thrbase.finishProgress(threadID);
-    }
+    return 0;}
 
 };
 LFHTEMP SparseMatrix<double> BiClassifier<C,R,S>::normalizeMK2(const SparseMatrix<uint32_t> &input)const{SparseMatrix<double> fout;
