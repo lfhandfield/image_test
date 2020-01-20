@@ -35,11 +35,13 @@ class Task : public LFHPrimitive::ArgumentParser, public LFHDisplay::ProcessStat
 	LFHDisplay::GUIDropList dd_menu;
 	
 	Task(); 
-        int OnKeyDown(const SDL_KeyboardEvent& Event); //OnKeyDown(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
+	void initGUI();
+	int OnKeyDown(const SDL_KeyboardEvent& Event); //OnKeyDown(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
         int OnKeyUp(const SDL_KeyboardEvent& Event); //OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
         int OnMaintain();//OnKeyUp(Event.key.keysym.sym,Event.key.keysym.mod,Event.key.keysym.unicode);
         int listen(LFHDisplay::GUImessage&);
 	void draw(LFHDisplay::MyWindow*);
 	void drawAlias(LFHDisplay::MyWindow*);
+
 };
 

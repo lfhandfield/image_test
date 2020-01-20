@@ -70,30 +70,6 @@ int main(int argc, char** argv){
 task(argc, argv);}
 
 Task::Task() : dd_menu((uint32_t)GUIID_MAIN_DROP,(uint32_t)GSTYID_TEXTBOX){
-	LFH_ALIVE;
-   	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(0,0.0f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(1,0.0f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(2,0.8f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(3,0.0f,0.5f,1.0f);
-	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setBorderSizes(16,16);
-		LFH_ALIVE;
-	    dd_menu.rect[2] =312;
-	    dd_menu.rect[3] =212;
-	    dd_menu.setPositionRelativeTo(1,LFHDisplay::RELPOS_TL_CORNER,0,0);
-		LFH_ALIVE;
-	dawin->insertGUI(&dd_menu);
-	LFH_ALIVE;
-        Vector<char*> listoptions;
-            listoptions.push_back(cloneString("Save"));
-            listoptions.push_back(cloneString("Use Shadow Camera (toggle)"));
-	    listoptions.push_back(cloneString("Draw Unit Bounds (toggle)"));
-            listoptions.push_back(cloneString("Swap Area and Template"));
-            listoptions.push_back(cloneString("Regen Pathing"));
-            listoptions.push_back(cloneString("Icon Rotation"));
-            listoptions.push_back(cloneString("Disable Lighting"));
-		LFH_ALIVE;
-	dd_menu.leachOptions(listoptions);	
-		LFH_ALIVE;
 }		
 void Task::nbaddtoken(char const * const token, int& min, int& max){
     switch(*token){
@@ -140,15 +116,47 @@ void Task::draw(LFHDisplay::MyWindow*){
 }
 void Task::drawAlias(LFHDisplay::MyWindow*){
 }
+void Task::initGUI(){
+ 	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(0,0.0f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(1,0.0f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(2,0.8f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setColorHIS(3,0.0f,0.5f,1.0f);
+	LFHDisplay::ctrl_state.gui_styles[(uint32_t)GSTYID_TEXTBOX].setBorderSizes(16,16);
+	    dd_menu.rect[2] =312;
+	    dd_menu.rect[3] =212;
+	    dd_menu.setPositionRelativeTo(1,LFHDisplay::RELPOS_TL_CORNER,0,0);
+	LFH_ALIVE;
+	printf("dawin ptr %p\n", dawin);
+	dawin->insertGUI(&dd_menu);
+	LFH_ALIVE;
+        Vector<char*> listoptions;
+        LFH_ALIVE;
+	listoptions.show();
+	LFH_ALIVE;
+	listoptions.push_back(cloneString("Save"));
+	LFH_ALIVE; 
+	listoptions.push_back(cloneString("Use Shadow Camera (toggle)"));
+	listoptions.push_back(cloneString("Draw Unit Bounds (toggle)"));
+        listoptions.push_back(cloneString("Swap Area and Template"));
+        listoptions.push_back(cloneString("Regen Pathing"));
+        listoptions.push_back(cloneString("Icon Rotation"));
+        listoptions.push_back(cloneString("Disable Lighting"));
+	LFH_ALIVE;fflush(stdout);
+	dd_menu.leachOptions(listoptions);	
+	LFH_ALIVE;fflush(stdout);
+
+}
 int Task::defstore(char* const * token, int nbtoken){
     if (!LFHDisplay::Controlstate::init_SDL(NULL,NULL)) return 1;
     if (!LFHDisplay::Controlstate::init_openGL()) return 1;
     LFHDisplay::ctrl_state << this;
     dawin = new LFHDisplay::MyWindow(1u,0u,1024,768,LFHDisplay::RELPOS_RIGHT,false, 0);
+    printf("window created at %p\n", dawin);
     LFHDisplay::ctrl_state.curwin = dawin;
     (*LFHDisplay::ctrl_state.curwin) << this;
     DefaultRessourceLoader* resl = new DefaultRessourceLoader();
     LFH_ALIVE;
+    this->initGUI();
     LFHDisplay::ctrl_state.main_control_loop(resl);
     LFH_ALIVE;
     delete(resl);
