@@ -148,12 +148,11 @@ namespace LFHPrimitive{
 		return string(buffer);
 	}
 
-	char* cloneString(const char* const what){
-		unsigned int i = strlen(what) +1;
-		char* _out = new char[i];
-		memcpy(_out,what,sizeof(char)*i);
-		return(_out);
-	}
+char* cloneString(const char* const what){
+    unsigned int i = strlen(what) +1;
+    char* _out = new char[i];
+    memcpy(_out,what,sizeof(char)*i);
+return(_out);}
 // exp(-x) + exp(-2x)+ exp(-2x))
 
 // log(incbeta(a,b,1 / (1 + exp(-x))))
@@ -2195,20 +2194,35 @@ int ArgumentParser::operator()(int nbargs, char * const * args, bool has_prog_na
 	}
 
 	TiffFile::TiffFile(const char* path, bool writeonly) : curfp_pos(4), endfile_pos(0){
+
 		if (path != NULL){
+			// either file does not exist, is read-only or is RW-enabled
 			f = (writeonly) ? NULL : fopen(path,"rb+");
 	char buffer[256];
 
-	if (f == NULL){ // it's a new file, init header!
-		f = fopen(path,"wb+");
-		if (f ==NULL) {fprintf(stderr,"could not open/create %s!\n", path); return;}
-		buffer[0] = 'I';
-		buffer[1] = 'I';
-		*(short*)(buffer + 2) = 42;
-		*(short*)(buffer + 2) = 42;
-		*(int*)(buffer + 4) = 0;
-		fwrite(buffer,sizeof(char),8,f);
-
+	if (f == NULL){
+        f = fopen(path,"rb");
+        if (f == NULL){ // it's a new file, init header!
+            f = fopen(path,"wb+");
+            if (f ==NULL) {fprintf(stderr,"could not open/create %s!\n", path); return;}
+            buffer[0] = 'I';
+            buffer[1] = 'I';
+            *(short*)(buffer + 2) = 42;
+            *(short*)(buffer + 2) = 42;
+            *(int*)(buffer + 4) = 0;
+            fwrite(buffer,sizeof(char),8,f);
+        }else{ // it's a read only file...
+            fread(buffer,sizeof(char),4,f);
+            if (buffer[0] == 'M'){
+                if (buffer[1] != 'M') {fprintf(stderr,"tried to open read-only %s, with is not a tiff file!\n", path); exit(1);}
+                inv =true;
+                if (*((short*)(buffer + 2)) != 10752) {fprintf(stderr,"tried to open read-only %s, with is not a tiff file!\n", path); exit(1);}
+                } else if (buffer[0]  == 'I'){
+                if (buffer[1] != 'I') {fprintf(stderr,"tried to open read-only %s, with is not a tiff file!\n", path); exit(1);}
+                inv=false;
+            if (*((short*)(buffer + 2)) != 42) {fprintf(stderr,"tried to open read-only %s, with is not a tiff file!\n", path); exit(1);}
+            }else fprintf(stderr,"tried to open read-only %s, with is not a tiff file!\n", path);
+        }
 	}else{ // filed exists!
 		fread(buffer,sizeof(char),4,f);
 		if (buffer[0] == 'M'){
