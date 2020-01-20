@@ -434,13 +434,10 @@ double d2_lncumNormal_dx2(double x){
    }
 }
 
-double logP_to_Normal( const double mu, const double sigmasquare, const double logP ){
-
-}
+double logP_to_Normal( const double mu, const double sigmasquare, const double logP ){return mu + logitPval_to_Zscore(logP - log_1_me_x(logP)) * sqrt(sigmasquare);}
 double logP_to_Exponential(const double scale, const double logP){return(-scale * logP);}
-double logP_to_Gamma(const double scale, const double shape, const double logP){
+double logP_to_Gamma(const double scale, const double shape, const double logP){return 0;}
 
-}
 double HypergeomericLogitPval(double k, uint32_t n, uint32_t K, uint32_t N){ // gets the probability masses that accounts for >= probfraction (or all if no threshold provided)
     uint32_t base = (uint32_t) floor(k +0.5);
     return HypergeomericLogitPval(base, n,K,N, k + 0.5 - base);

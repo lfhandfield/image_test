@@ -2502,6 +2502,8 @@ public:
 	template<class DATA, unsigned int TSIZE > void cluster_likelihood( const Vector< Tuple< WeightElem<DATA, 2> , TSIZE > > &data, NODE (*report)(const GaussElem< Tuple<DATA, TSIZE > > &,const GaussElem< Tuple<DATA, TSIZE > > &));
 	class Task_cluster_likelihood;
 	ERRCODE cluster_likelihood(const SparseMatrix< double > &data);
+	class Task_cluster_likelihood_bruteforce; // uses 0 or 1 dim to reduce searchspace
+	ERRCODE cluster_likelihood_bruteforce(const SparseMatrix< double > &data, bool use_one = false);
 	template<class DATA> void cluster(Vector<DATA> &data, NODE (*metric)(const DATA&, const DATA&), DATA (*merge)(const DATA&, const DATA&) = NULL);
 	template<class DATA> void cluster_singlelink(Vector<DATA> &data, NODE (*metric)(const DATA&, const DATA&));
 	template<class DATA> void cluster_completelink(Vector<DATA> &data, NODE (*metric)(const DATA&, const DATA&));

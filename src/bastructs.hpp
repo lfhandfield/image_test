@@ -2655,6 +2655,19 @@ return *this;}
 
 #undef LFHTEMP
 #define LFHTEMP template<class C>
+LFHTEMP class SparseMatrix<C>::Task_getPrincipalComponents{
+public:
+    const SparseMatrix<C> &input;
+    TMatrix<double> fout;
+    Task_getPrincipalComponents(const SparseMatrix<C> &_input, int nbdims): input(_input){
+        Tuple<uint32_t, 2u> coor;
+        fout.setSizes(input.computeNBrows(),nbdims);
+        fout.toRand();
+    }
+};
+LFHTEMP TMatrix<double> SparseMatrix<C>::getPrincipalComponents(uint32_t nbcomp) const{
+    SparseMatrix<C>::Task_getPrincipalComponents task(*this);
+return task.fout;}
 
 LFHTEMP TMatrix<double> SparseMatrix<C>::KendallColumns()const{TMatrix<double> fout;
     // rank of entries within columns are compared, with "0" being the only entry allowed to tie

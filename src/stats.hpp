@@ -1348,9 +1348,9 @@ LFHTEMP template<class P> void BiClassifier<C,R,S>::run2D_EM_v2(const SparseMatr
             par_RM.show();
             printf("backup: %e\n", logalpha);
             oldRM.show();
-            printf("FAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAIL %e\n", old_LL + that_ll_constant); fflush(stdout);
+            printf("FAILFAIL %e\n", old_LL + that_ll_constant); fflush(stdout);
             par_RM = (oldRM * 3.0 + par_RM) * 0.25;
-            printf("FAILFAILFAILFAILFAILFAILFAILFAILFAILFAILFAIL %e\n", parascope[0].ll[0] + that_ll_constant); fflush(stdout);
+            printf("FAILFAIL %e\n", parascope[0].ll[0] + that_ll_constant); fflush(stdout);
             expected *= 0.25;
             logalpha -= 1.0;
         }

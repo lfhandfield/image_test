@@ -1786,7 +1786,7 @@ LFH_GOLD	double Prob_NBdistrib(uint32_t x, double r, double p);
 
 //log (2 - sum a_i) + log (sum exp(logerf(v) + log(w) - log(f))) + log(f)
 
-LFH_GOLD	double randExponential(); // sample exponential distribution mean mean 1
+LFH_GOLD	double randExponential(); // sample exponential distribution mean 1
 LFH_GOLD	double randUniform();
 uint32_t randSample(double* prob, uint32_t length); // sample integer with given probabilities
 
@@ -1804,9 +1804,9 @@ double d2_lncumNormal_dx2(double x);
 
 double logitPval_to_Zscore(double x);
 
-double logP_to_Normal(const double mu, const double sigmasquare, const double logP = -randExponential());
+double logP_to_Normal(const double mu, const double sigmasquare, const double logP = -randExponential()); // TO_CHECK
 double logP_to_Exponential(const double scale, const double logP = -randExponential());
-double logP_to_Gamma(const double scale, const double shape, const double logP =-randExponential());
+double logP_to_Gamma(const double scale, const double shape, const double logP =-randExponential()); // TO_DO
 
 myHashmap<uint32_t, double, defaultHashFnc<uint32_t> > getHypergeomericMasses(uint32_t n, uint32_t K, uint32_t N, double probfraction = 2.0); // gets the probability masses that accounts for >= probfraction (or all if no threshold provided)
 void getHypergeomericCover(Tuple<uint32_t> &fout, uint32_t n, uint32_t K, uint32_t N); // sample hypergeometric distribution at equidistant point

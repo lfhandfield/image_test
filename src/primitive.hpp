@@ -5762,6 +5762,7 @@ LFHTEMP class Forest<C,nbdata>::Task_cluster_likelihood{
 
     return 0;}
 };
+
 LFHTEMP ERRCODE Forest<C,nbdata>::cluster_likelihood(const SparseMatrix< double > &data){
     GaussCloud<uint32_t> hie;
     Forest<C,nbdata>::Task_cluster_likelihood locask(data,hie);
@@ -5824,7 +5825,121 @@ LFHTEMP ERRCODE Forest<C,nbdata>::cluster_likelihood(const SparseMatrix< double 
     */
 
 return 0;}
+LFHTEMP class Forest<C,nbdata>::Task_cluster_likelihood_bruteforce{
+    public:
+    const SparseMatrix< double > &data;
+    HeapTree<KeyElem<double,uint32_t> > mastertree;
+    Tuple< HeapTree<KeyElem<double,uint32_t> > > nodetree;
+    Tuple<uint32_t> thranges;
+    uint32_t task;
+    double shared_minimum;
+    TMatrix<double> projection_denum;
+    TMatrix<double> projection;
+    TMatrix<double> brojection;
+    Tuple< void* > curoutput;
+    Tuple< Trianglix<double> > output_covar;
 
+    Task_cluster_likelihood_bruteforce(const SparseMatrix< double > &_data):data(_data){ // reference initializations for shared scope
+    }
+    uint32_t operator()(uint32_t threadID){
+        switch(task){
+        case 0:{ // generate a random matrix
+            Tuple<double,0u, TUPLE_FLAG_REMOTE_MEMORY> rdata; rdata.tup_size = projection.sizes[0];
+            output_covar[threadID].setSize(rdata.tup_size).toZero();
+            for(uint32_t i = thranges[threadID]; i <thranges[threadID+1];i++){ // , tb.updateProgress(threadID)
+                rdata = projection.data + i * rdata.tup_size;
+                for(uint32_t j = 0; j < rdata.tup_size ;j++) rdata[j] =sampleGaussian();
+                for(uint32_t j = 0; j < rdata.tup_size ;j++)
+                output_covar[threadID] += Trianglix<double>(rdata);
+            }
+        }break;
+        case 1:{
+            Tuple<double,0u, TUPLE_FLAG_REMOTE_MEMORY> rdata; rdata.tup_size = brojection.sizes[0];
+            for(uint32_t i = thranges[threadID]; i <thranges[threadID+1];i++){ // , tb.updateProgress(threadID)
+                rdata = brojection.data + i * rdata.tup_size;
+                rdata.toZero();
+                //rdata = projection_denum * rdata;
+
+                if (auto ite = data.data[i].getIterator()) do{
+                  //  for(uint32_t j = 0 ; j< brojection.getSize();j++)
+
+                }while(ite++);
+                // output_covar[threadID] += Trianglix<double>(rdata); to check
+            }
+        }break;
+
+        }
+        //tb.finishProgress(threadID);
+
+    return 0;}
+};
+
+LFHTEMP ERRCODE Forest<C,nbdata>::cluster_likelihood_bruteforce(const SparseMatrix< double > &data, bool use_one){
+    Forest<C,nbdata>::Task_cluster_likelihood_bruteforce locask(data);
+
+    TMatrix<double> proj = data.getPrincipalComponents(1);
+    proj.show();
+
+    // only orders entries
+
+    // populate hierarchical structure
+
+    // loop
+
+    // if heaptree is empty:
+    // find an "horizon distance" (hdist) corresponding to the expected distance between the closest points.
+    // and
+    // buffer all pairs of point whose distance is below the horizon distance in heaptree
+
+    // else remove smallest from heaptree, and populate any new pair under horizon distance to the heaptree
+
+
+    // find closest to each point and populate comparison heaptree, set horizon distance to match
+
+
+    // merge 2 node and find k valid
+
+
+
+    /*
+    Trianglix<double> covar;
+    unsigned int nbrows = data.computeNBrows();
+
+    // find and maintain closest node to each point
+    uint32_t nbthreads = 16;
+    locask.output_covar.setSize(nbthreads); // thread buffer for projection
+
+
+
+
+    //  B\sim D = QAQ = sum(Qcc^tQ^t)
+
+    // Do PCA reduction
+    locask.projection.setSizes(16,nbrows); // buffer for projection
+    locask.brojection.setSizes(16,data.getNBcols());
+
+    // make random non-orthogonal projection
+    locask.task=0; tb.initEqualRanges(locask.thranges, nbrows, nbthreads);
+    for(uint32_t i =0; i< nbthreads;i++) tb.submit(locask, i);
+    tb.joinAll();
+
+    covar = locask.output_covar[0];
+    for(uint32_t i =1; i< nbthreads;i++) covar += locask.output_covar[i];
+
+    FunctionScope<double,double,double> fnc_denum(pow,(double)-0.5);
+    TMatrix<double> hehe = (TMatrix<double>)covar;
+
+    locask.projection_denum = covar.makeQDecomposition(fnc_denum, true);
+    locask.task=1; tb.initEqualRanges(locask.thranges,data.getNBcols() , nbthreads);
+    for(uint32_t i =0; i< nbthreads;i++) tb.submit(locask, i);
+    tb.joinAll();
+    covar = locask.output_covar[0];
+    for(uint32_t i =1; i< nbthreads;i++) covar += locask.output_covar[i];
+    printf("new Covariance: (should be orthogonal!)\n"); fflush(stdout);
+    covar.show();
+    */
+
+return 0;}
 
 	LFHTEMP template<class D, unsigned int TSIZE>
 	void Forest<C,nbdata>::cluster_likelihood_ratio(const Vector< Tuple<WeightElem<D,2> , TSIZE > > &data, C (*report)(const GaussElem< Tuple<D, TSIZE > > &, const GaussElem< Tuple<D, TSIZE > > &)){

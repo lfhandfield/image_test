@@ -3214,6 +3214,10 @@ public:
 //    Tuple<double> wilcoxTestZScore(const Tuple< Tuple<uint32_t> > &lists, Tuple<double> *opt_logit_auroc=NULL, bool print_prog =true, bool return_logitpval=false)const; // compute rank test for each column for specific rows only statistics , Zscore and optionnaly logit Auroc reported
 
     TMatrix<double> KendallColumns()const; // compute rank test for each column for specific rows only statistics , Zscore and optionnaly logit Auroc reported
+
+    class Task_getPrincipalComponents;
+    TMatrix<double> getPrincipalComponents(uint32_t nbcomponents) const; // finds components in the variance spawned by collumns
+
 };
 
 
