@@ -9,6 +9,7 @@ RUN apt-get -y install libglu1-mesa-dev mesa-common-dev mesa-utils libsdl2-2.0-0
 RUN apt-get -y install libc6-dbg gdb valgrind libfreetype6-dev
 RUN mkdir /opt/R
 RUN R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatmap','R.utils', 'Rcpp', 'RcppArmadillo', 'rgl', 'roxygen2'), lib = '/opt/R/')" 
+RUN R -r "install.packages(c('mulltest'), lib = '/opt/R/')"
 RUN R -e "install.packages(c('Seurat', 'gProfileR','Rtsne'), repos='http://cran.rstudio.com/', lib='/opt/R/')"
 RUN R -e "BiocManager::install(c('SingleCellExperiment', 'scmap','M3Drop', 'monocle', 'DEseq2', 'DropletUtils'))" 
 WORKDIR /opt/display
