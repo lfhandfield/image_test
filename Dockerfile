@@ -1,6 +1,7 @@
 FROM bioconductor/release_base2
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV R_LIBS_USER=$HOME/R 
 RUN apt-get update 
 RUN apt-get -y install build-essential vim man
 RUN apt-get -y install libglu1-mesa-dev mesa-common-dev mesa-utils libsdl2-2.0-0 libsdl2-dev glew-utils libglew-dev libsdl2-net-2.0-0 libsdl2-net-dev 
