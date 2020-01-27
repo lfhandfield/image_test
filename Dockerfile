@@ -20,5 +20,5 @@ COPY src /opt/display/src
 COPY Images /opt/display/Images
 COPY Makefile /opt/display/Makefile
 RUN make
-ENV PATH="/opt/display/:${PATH}"
+ENV PATH="/opt/display/:/opt/miniconda/bin/:${PATH}"
 CMD ["helloworld"]
