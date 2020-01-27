@@ -14,7 +14,6 @@ RUN R -e "install.packages(c('Seurat', 'gProfileR','Rtsne'), repos='http://cran.
 RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /opt/miniconda.sh
 RUN bash /opt/miniconda.sh -b -p /opt/miniconda 
 RUN rm /opt/miniconda.sh
-RUN /opt/minicondaconda install bioconda -conda-forge snakemake
 WORKDIR /opt/display
 COPY src /opt/display/src
 COPY Images /opt/display/Images
