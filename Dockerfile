@@ -15,6 +15,12 @@ RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 RUN bash /opt/miniconda.sh -b -p /opt/miniconda
 RUN /opt/miniconda/condabin/conda install -c bioconda -c conda-forge snakemake
 RUN rm /opt/miniconda.sh
+RUN wget https://github.com/singularityware/singularity/releases/download/2.5.2/singularity-$VERSION.tar.gz
+RUN tar xvf singularity-2.5.2.tar.gz
+RUN cd singularity-2.5.2
+RUN ./configure --prefix=/opt/singularity
+RUN make
+RUN sudo make install
 WORKDIR /opt/display
 COPY src /opt/display/src
 COPY Images /opt/display/Images
