@@ -18,13 +18,5 @@ RUN rm /opt/miniconda.sh
 RUN wget https://github.com/singularityware/singularity/releases/download/2.5.2/singularity-2.5.2.tar.gz
 RUN tar xvf singularity-2.5.2.tar.gz
 RUN cd singularity-2.5.2
-RUN ./configure --prefix=/opt/singularity
-RUN make
-RUN sudo make install
-WORKDIR /opt/display
-COPY src /opt/display/src
-COPY Images /opt/display/Images
-COPY Makefile /opt/display/Makefile
-RUN make
 ENV PATH="/opt/display/:/opt/miniconda/bin/:${PATH}"
 CMD ["helloworld"]
