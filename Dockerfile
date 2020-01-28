@@ -13,6 +13,7 @@ RUN apt-get -y install libarchive-dev
 RUN wget https://github.com/singularityware/singularity/releases/download/2.5.2/singularity-2.5.2.tar.gz -O /opt/singularity.tar.gz ; tar xvf /opt/singularity.tar.gz
 WORKDIR /singularity-2.5.2/
 RUN ./configure --prefix=/opt/singularity ; make ; sudo make install
-RUN rm -r -f /singularity-2.5.2/
-ENV PATH="/opt/display/:/opt/miniconda/bin/:${PATH}"
+WORKDIR /singularity/
+RUN rm -r -f singularity-2.5.2/
+ENV PATH="/opt/display/:/opt/miniconda/bin/:/opt/singularity/bin/:${PATH}"
 CMD ["helloworld"]
