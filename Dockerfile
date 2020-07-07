@@ -21,5 +21,6 @@ RUN apt-get -y install libarchive-dev
 # RUN wget https://github.com/singularityware/singularity/releases/download/2.5.2/singularity-2.5.2.tar.gz -O /opt/singularity.tar.gz ; tar xvf /opt/singularity.tar.gz ; rm /opt/singularity.tar.gz ; cd singularity-2.5.2; ./configure --prefix=/opt/singularity ; make ; sudo make install; cd .. ; rm -r -f singularity-2.5.2/
 #ENV PATH="/opt/display/:/opt/miniconda/bin/:${PATH}"
 #RUN add-apt-repository universe ; apt update ; apt upgrade
-RUN apt install chromium
+RUN apt-get update 
+RUN apt install chromium-browser
 CMD ["helloworld"]
