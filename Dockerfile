@@ -11,10 +11,15 @@ RUN mkdir /opt/R; R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatm
 RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /opt/miniconda.sh ; bash /opt/miniconda.sh -b -p /opt/miniconda ; /opt/miniconda/condabin/conda install -c bioconda -c conda-forge snakemake ; rm /opt/miniconda.sh
 RUN apt-get -y install libarchive-dev
 # install manually all the missing libraries
-RUN apt-get install -y --fix-missing gconf-service libasound2 libatk1.0-0 libcairo2 libcups2 libfontconfig1 libgdk-pixbuf2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libxss1 fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils
+#RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#RUN dpkg -i google-chrome-stable_current_amd64.deb --fix-missing; apt-get -fy install
+
+#RUN apt-get install -y --fix-missing gconf-service libasound2 libatk1.0-0 libcairo2 libcups2 libfontconfig1 libgdk-pixbuf2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libxss1 fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils
 # install chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
+#RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
 # RUN wget https://github.com/singularityware/singularity/releases/download/2.5.2/singularity-2.5.2.tar.gz -O /opt/singularity.tar.gz ; tar xvf /opt/singularity.tar.gz ; rm /opt/singularity.tar.gz ; cd singularity-2.5.2; ./configure --prefix=/opt/singularity ; make ; sudo make install; cd .. ; rm -r -f singularity-2.5.2/
-ENV PATH="/opt/display/:/opt/miniconda/bin/:${PATH}"
+#ENV PATH="/opt/display/:/opt/miniconda/bin/:${PATH}"
+RUN add-apt-repository universe ; apt update ; apt upgrade
+RUN apt install chromium-browser
 CMD ["helloworld"]
