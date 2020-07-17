@@ -11,7 +11,8 @@ RUN mkdir /opt/R; R -e "install.packages(c('ggplot2','grid', 'gridExtra','pheatm
 RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /opt/miniconda.sh ; bash /opt/miniconda.sh -b -p /opt/miniconda ; /opt/miniconda/condabin/conda install -c bioconda -c conda-forge snakemake ; rm /opt/miniconda.sh
 RUN apt-get -y install libarchive-dev
 RUN apt-get install python3
-RUN python -m pip install -U numpy; python -m pip install -U scvi ;  python -m pip install -U matplotlib ; python -m pip install -U ipywidgets; python -m pip install -U scirpy
+RUN python -m pip install -U numpy; python -m pip install -U pandas; python -m pip install -U scanpy;  python -m pip install -U matplotlib ;  python -m pip install -U ipywidgets;
+RUN python -m pip install -U scvi ;  python -m pip install -U scirpy
 
 CMD ["helloworld"]
 
