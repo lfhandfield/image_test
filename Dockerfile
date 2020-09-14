@@ -12,7 +12,7 @@ RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 RUN apt-get -y install libarchive-dev
 RUN apt-get install python3
 RUN python -m pip install -U numpy; python -m pip install -U pandas; python -m pip install -U scipy; python -m pip install -U scanpy;  python -m pip install -U matplotlib ;  python -m pip install -U ipywidgets;  python -m pip install -U anndata
-RUN python -m pip install -U scvi ;  python -m pip install -U scirpy
-
+RUN python -m pip install -U scvi ;  python -m pip install -U scirpy;
+RUN python -m pip install -U vireoSNP ; python -m pip install -U scrublet; python -m pip install -U rbcde
 CMD ["helloworld"]
 
