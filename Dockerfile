@@ -13,7 +13,7 @@ RUN apt-get -y install libarchive-dev python3 python3-pip python3-setuptools
 RUN python3 -m pip install -U numpy; python3 -m pip install -U pandas; python3 -m pip install -U scipy; python3 -m pip install -U scanpy;  python3 -m pip install -U matplotlib ;  python3 -m pip install -U anndata
 RUN python3 -m pip install -U scvi ;  python3 -m pip install -U scirpy;  python3 -m pip install -U ipywidgets
 RUN python3 -m pip install -U vireoSNP ; python3 -m pip install -U scrublet; python3 -m pip install -U rbcde ; python3 -m pip install cellSNP
-
+RUN R -e "install.packages(c('devtools', 'soupX')); library(devtools) ; install_github('campbio/celda')"
 
 CMD ["helloworld"]
 
